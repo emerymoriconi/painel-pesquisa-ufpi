@@ -1,0 +1,35 @@
+# Python
+backend/.venv/
+backend/__pycache__/
+backend/**/__pycache__/
+backend/*.pyc
+backend/**/*.pyc
+backend/.env
+backend/*.egg-info/
+backend/.coverage
+backend/htmlcov/
+backend/test.db
+backend/.pytest_cache/
+backend/**/.pytest_cache/
+
+# Dados — xlsx ficam só na sua máquina, não no GitHub
+backend/data/xlsx/
+
+# Node
+frontend/node_modules/
+frontend/.next/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+frontend/.env*.local
+
+# Docker
+*.log
+docker-compose.override.yml
+
+# VS Code
+.vscode/
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
