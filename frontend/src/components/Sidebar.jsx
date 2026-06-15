@@ -1,0 +1,97 @@
+import { NavLink, useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
+import { useTheme } from '../context/ThemeContext'
+
+const links = [
+  { to: '/',                     label: 'Geral',                icone: '🏠', end: true },
+  { to: '/projetos-pdi',         label: 'Projetos PD&I',        icone: '📋' },
+  { to: '/projetos-finep',       label: 'Projetos FINEP',       icone: '💰' },
+  { to: '/producao-intelectual', label: 'Produção Intelectual', icone: '💡' },
+  { to: '/bolsistas',            label: 'Bolsistas',            icone: '🎓' },
+  { to: '/nucleos',              label: 'Núcleos de Pesquisa',  icone: '⚛️' },
+  { to: '/grupos',               label: 'Grupos de Pesquisa',   icone: '👥' },
+  { to: '/incubadas',            label: 'Empresas Incubadas',   icone: '🚀' },
+  { to: '/pos-graduacao',        label: 'Pós-Graduação',        icone: '🎓' },
+  { to: '/laboratorios',         label: 'Laboratórios',         icone: '🔬' },
+]
+
+const linkClass = ({ isActive }) =>
+  [
+    'flex items-center gap-3 px-4 py-3 text-sm transition-colors border-l-[3px]',
+    isActive
+      ? 'bg-azul-medio text-white border-white'
+      : 'text-white/70 border-transparent hover:bg-white/10',
+  ].join(' ')
+
+export default function Sidebar({ isOpen, onClose }) {
+  const { sair } = useAuth()
+  const { dark, toggleTheme } = useTheme()
+  const navigate = useNavigate()
+
+  function handleLogout() {
+    sair()
+    navigate('/login')
+  }
+
+  return (
+    <>
+      {/* Backdrop mobile */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          onClick={onClose}
+        />
+      )}
+
+      <aside
+        className={[
+          'fixed inset-y-0 left-0 z-50 w-64 bg-azul-escuro flex flex-col',
+          'transition-transform duration-300 ease-in-out',
+          isOpen ? 'translate-x-0' : '-translate-x-full',
+          'md:static md:translate-x-0 md:z-auto',
+        ].join(' ')}
+      >
+        {/* Topo */}
+        <div className="px-5 py-5 border-b border-white/10">
+          <span className="text-white text-lg font-bold tracking-tight">
+            Painel UFPI
+          </span>
+        </div>
+
+        {/* Navegação */}
+        <nav className="flex-1 overflow-y-auto py-2">
+          {links.map(({ to, label, icone, end }) => (
+            <NavLink
+              key={to}
+              to={to}
+              end={end}
+              className={linkClass}
+              onClick={onClose}
+            >
+              <span>{icone}</span>
+              <span>{label}</span>
+            </NavLink>
+          ))}
+        </nav>
+
+        {/* Rodapé */}
+        <div className="border-t border-white/10 px-4 py-4 flex flex-col gap-2">
+          <button
+            onClick={toggleTheme}
+            className="flex items-center gap-3 text-white/70 hover:text-white text-sm px-2 py-2 rounded hover:bg-white/10 transition-colors"
+          >
+            <span>{dark ? '☀️' : '🌙'}</span>
+            <span>{dark ? 'Modo claro' : 'Modo escuro'}</span>
+          </button>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 text-white/70 hover:text-white text-sm px-2 py-2 rounded hover:bg-white/10 transition-colors"
+          >
+            <span>🚪</span>
+            <span>Sair</span>
+          </button>
+        </div>
+      </aside>
+    </>
+  )
+}

@@ -31,7 +31,7 @@ def incubadas_kpis(
     )
     return {
         "total_incubadas":    total_incubadas,
-        "graduadas":          graduadas,
+        "total_graduadas":    graduadas,
         "total_incubadoras":  total_incubadoras,
     }
 

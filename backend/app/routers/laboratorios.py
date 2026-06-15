@@ -19,7 +19,7 @@ def laboratorios_kpis(
         .filter(_L.nome != None)
         .scalar() or 0
     )
-    return {"total": total}
+    return {"total_laboratorios": total}
 
 
 @router.get("/filtros")

@@ -19,7 +19,7 @@ def pos_kpis(
         .filter(_P.programa != None)
         .scalar() or 0
     )
-    return {"total": total}
+    return {"total_pos_graduacao": total}
 
 
 @router.get("/filtros")

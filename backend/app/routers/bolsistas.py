@@ -25,7 +25,7 @@ def bolsistas_kpis(
         .scalar() or 0
     )
     total = db.query(func.count(_B.id)).scalar() or 0
-    return {"cnpq": cnpq, "ufpi": ufpi, "total": total}
+    return {"total_cnpq": cnpq, "total_ufpi": ufpi, "total": total}
 
 
 @router.get("/filtros")

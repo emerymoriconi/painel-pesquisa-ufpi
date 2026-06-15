@@ -29,7 +29,7 @@ def nucleos_kpis(
         .filter(_N.situacao.ilike("inativo"))
         .scalar() or 0
     )
-    return {"total": total, "ativos": ativos, "inativos": inativos}
+    return {"total_nucleos": total, "total_ativos": ativos, "total_inativos": inativos}
 
 
 @router.get("/filtros")

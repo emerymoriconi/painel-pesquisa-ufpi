@@ -26,7 +26,7 @@ def pdi_kpis(
         .filter(_PDI.situacao.ilike("Em andamento"))
         .scalar() or 0
     )
-    return {"concluidos": concluidos, "em_andamento": em_andamento}
+    return {"total_concluidos": concluidos, "total_em_andamento": em_andamento}
 
 
 @router.get("/pdi/filtros")

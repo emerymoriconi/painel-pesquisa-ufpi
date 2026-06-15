@@ -19,7 +19,7 @@ def grupos_kpis(
         .filter(_G.status.ilike("certificado"))
         .scalar() or 0
     )
-    return {"total": total}
+    return {"total_grupos": total}
 
 
 @router.get("/filtros")

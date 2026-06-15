@@ -27,11 +27,20 @@ services:
       ADMIN_USERNAME: "admin"
       ADMIN_PASSWORD_HASH: "$$2b$$12$$e9TD72CAWM0ogW9Ap2atqO8oBrAmtAsQyEWcPZj6MWz/rdqLtaH4."
       ULTIMA_ATUALIZACAO: "08/02/2026"
+      ALLOWED_ORIGINS: "http://localhost"
     depends_on:
       db:
         condition: service_healthy
     volumes:
       - ./backend/data/xlsx:/app/data/xlsx
+
+  frontend:
+    build: ./frontend
+    container_name: painel_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - api
 
 volumes:
   postgres_data:
