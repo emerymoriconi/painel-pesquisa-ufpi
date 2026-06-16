@@ -9,6 +9,14 @@ router = APIRouter(prefix="/bolsistas", tags=["Bolsistas"])
 _B = models.Bolsista
 
 
+def _filtrar_bolsistas(q, modalidade=None, orgao=None, campus_centro=None, nome=None):
+    if modalidade:    q = q.filter(_B.modalidade.ilike(f"%{modalidade}%"))
+    if orgao:         q = q.filter(_B.orgao.ilike(f"%{orgao}%"))
+    if campus_centro: q = q.filter(_B.campus_centro.ilike(f"%{campus_centro}%"))
+    if nome:          q = q.filter(_B.nome.ilike(f"%{nome}%"))
+    return q
+
+
 @router.get("/kpis")
 def bolsistas_kpis(
     db: Session = Depends(get_db),
@@ -46,38 +54,34 @@ def bolsistas_filtros(
     }
 
 
-# Rota estática antes de /{id}
 @router.get("/por-campus")
 def bolsistas_por_campus(
+    modalidade:    str | None = Query(None),
+    orgao:         str | None = Query(None),
+    campus_centro: str | None = Query(None),
+    nome:          str | None = Query(None),
     db: Session = Depends(get_db),
     _: dict = Depends(verificar_autenticacao),
 ):
-    rows = (
-        db.query(_B.campus_centro, func.count(_B.nome).label("total"))
-        .filter(_B.campus_centro != None)
-        .group_by(_B.campus_centro)
-        .order_by(func.count(_B.nome).desc())
-        .all()
-    )
+    q = db.query(_B.campus_centro, func.count(_B.nome).label("total"))
+    q = q.filter(_B.campus_centro != None)
+    q = _filtrar_bolsistas(q, modalidade, orgao, campus_centro, nome)
+    rows = q.group_by(_B.campus_centro).order_by(func.count(_B.nome).desc()).all()
     return [{"campus": r.campus_centro, "total": r.total} for r in rows]
 
 
-@router.get("/", response_model=list[schemas.BolsistaOut])
+@router.get("", response_model=list[schemas.BolsistaOut])
 def listar_bolsistas(
-    modalidade: str | None = Query(None),
-    orgao: str | None = Query(None),
+    modalidade:    str | None = Query(None),
+    orgao:         str | None = Query(None),
     campus_centro: str | None = Query(None),
-    nome: str | None = Query(None),
-    skip: int = Query(0, ge=0),
-    limit: int = Query(20, ge=1, le=100),
+    nome:          str | None = Query(None),
+    skip:  int = Query(0, ge=0),
+    limit: int = Query(9999, ge=1, le=9999),
     db: Session = Depends(get_db),
     _: dict = Depends(verificar_autenticacao),
 ):
-    q = db.query(_B)
-    if modalidade:    q = q.filter(_B.modalidade.ilike(f"%{modalidade}%"))
-    if orgao:         q = q.filter(_B.orgao.ilike(f"%{orgao}%"))
-    if campus_centro: q = q.filter(_B.campus_centro.ilike(f"%{campus_centro}%"))
-    if nome:          q = q.filter(_B.nome.ilike(f"%{nome}%"))
+    q = _filtrar_bolsistas(db.query(_B), modalidade, orgao, campus_centro, nome)
     return q.offset(skip).limit(limit).all()
 
 

@@ -13,15 +13,14 @@ import TabelaPaginada from '../components/TabelaPaginada'
 import TooltipGrafico from '../components/TooltipGrafico'
 import BotaoExportarCSV from '../components/BotaoExportarCSV'
 import BotaoExportarPNG from '../components/BotaoExportarPNG'
-
-const LIMITE = 20
+import { iconLaboratorios } from '../assets/icons.js'
 
 const COLUNAS = [
-  { key: 'nome',       label: 'NOME' },
-  { key: 'sigla',      label: 'SIGLA' },
+  { key: 'nome',        label: 'NOME' },
+  { key: 'sigla',       label: 'SIGLA' },
   { key: 'centro_campi', label: 'CENTRO/CAMPI' },
   { key: 'responsavel', label: 'RESPONSÁVEL' },
-  { key: 'email',      label: 'EMAIL' },
+  { key: 'email',       label: 'EMAIL' },
 ]
 
 const CORES_PIE = [
@@ -36,23 +35,19 @@ function toOpts(arr = []) {
 function CardLabs({ valor, loading }) {
   if (loading) return <SkeletonCard />
   return (
-    <div className="h-full bg-azul-escuro text-white rounded-xl px-6 py-10 flex flex-col items-center justify-center text-center">
-      <p className="text-lg font-bold uppercase tracking-wide opacity-80 leading-tight">
-        Laboratórios
-      </p>
-      <span className="text-4xl mt-3">🔬</span>
-      <p className="text-6xl font-bold mt-3">{valor ?? '—'}</p>
+    <div className="h-full bg-azul-escuro text-white rounded-xl px-4 py-4 flex flex-col items-center justify-center text-center">
+      <p className="text-xs font-bold uppercase tracking-wide opacity-80">Laboratórios</p>
+      <img src={iconLaboratorios} alt="" className="w-7 h-7 object-contain mt-2 opacity-90" />
+      <p className="text-3xl font-bold mt-2">{valor ?? '—'}</p>
     </div>
   )
 }
 
 export default function Laboratorios() {
-  const [kpis,          setKpis]          = useState({})
-  const [opcoes,        setOpcoes]        = useState({})
+  const [kpis,           setKpis]           = useState({})
+  const [opcoes,         setOpcoes]         = useState({})
   const [dadosPorCentro, setDadosPorCentro] = useState([])
-  const [labs,          setLabs]          = useState([])
-  const [pagina,        setPagina]        = useState(1)
-  const [totalPaginas,  setTotalPaginas]  = useState(1)
+  const [labs,           setLabs]           = useState([])
 
   const [filtroNome,   setFiltroNome]   = useState('')
   const [filtroCentro, setFiltroCentro] = useState('')
@@ -64,83 +59,56 @@ export default function Laboratorios() {
   const refGrafico = useRef(null)
 
   const filtrosAtivos = {
-    nome:        filtroNome   || undefined,
+    nome:         filtroNome   || undefined,
     centro_campi: filtroCentro || undefined,
   }
 
-  // Dados estáticos — mount apenas
   useEffect(() => {
-    getKPIsLaboratorios()
-      .then(setKpis)
-      .catch(() => {})
-      .finally(() => setLoadingKpis(false))
-
-    getFiltrosLaboratorios()
-      .then(setOpcoes)
-      .catch(() => {})
+    getKPIsLaboratorios().then(setKpis).catch(() => {}).finally(() => setLoadingKpis(false))
+    getFiltrosLaboratorios().then(setOpcoes).catch(() => {})
   }, [])
 
-  // Gráfico — recarrega quando filtros mudam
   useEffect(() => {
     setLoadingGrafico(true)
-    getLaboratoriosPorCentro(filtrosAtivos)
-      .then(setDadosPorCentro)
-      .catch(() => {})
-      .finally(() => setLoadingGrafico(false))
+    getLaboratoriosPorCentro(filtrosAtivos).then(setDadosPorCentro).catch(() => {}).finally(() => setLoadingGrafico(false))
   }, [filtroNome, filtroCentro]) // eslint-disable-line
 
-  // Tabela — recarrega quando filtros ou página mudam
   useEffect(() => {
     setLoadingTabela(true)
-    getLaboratorios({ ...filtrosAtivos, skip: (pagina - 1) * LIMITE, limit: LIMITE })
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setLabs(data)
-          setTotalPaginas(1)
-        } else {
-          setLabs(data.items ?? [])
-          setTotalPaginas(Math.max(1, Math.ceil((data.total ?? 0) / LIMITE)))
-        }
-      })
+    getLaboratorios({ ...filtrosAtivos, limit: 9999 })
+      .then((data) => setLabs(Array.isArray(data) ? data : (data.items ?? [])))
       .catch(() => {})
       .finally(() => setLoadingTabela(false))
-  }, [filtroNome, filtroCentro, pagina]) // eslint-disable-line
-
-  function comReset(setter) {
-    return (val) => { setter(val); setPagina(1) }
-  }
+  }, [filtroNome, filtroCentro]) // eslint-disable-line
 
   function limparFiltros() {
     setFiltroNome('')
     setFiltroCentro('')
-    setPagina(1)
   }
 
   const totalPie = dadosPorCentro.reduce((s, d) => s + (d.total ?? 0), 0)
 
   return (
-    <div className="space-y-6">
+    <div className="h-full flex flex-col gap-3">
 
-      {/* ── Top: Card + Gráfico + Filtros ──────────────────────────── */}
-      <div className="flex flex-col lg:flex-row gap-4 items-stretch">
+      {/* ── Top: Card + Gráfico + Filtros ── */}
+      <div className="flex-shrink-0 flex gap-3 items-stretch" style={{ height: '230px' }}>
 
-        {/* Card único */}
-        <div className="lg:w-52 flex-shrink-0">
+        {/* Card */}
+        <div className="w-44 flex-shrink-0">
           <CardLabs valor={kpis.total_laboratorios} loading={loadingKpis} />
         </div>
 
         {/* Gráfico pizza */}
-        <div className="flex-1 bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm">
+        <div className="flex-1 bg-white dark:bg-gray-800 rounded-xl p-3 shadow-sm">
           <div ref={refGrafico}>
-            <h3 className="text-sm font-semibold text-center text-gray-700 dark:text-gray-200 mb-2">
+            <h3 className="text-xs font-semibold text-center text-gray-700 dark:text-gray-200 mb-1">
               Nº de Laboratório x Centro/Campi
             </h3>
             {loadingGrafico ? (
-              <div className="h-64 flex items-center justify-center text-gray-400 text-sm">
-                Carregando…
-              </div>
+              <div className="h-40 flex items-center justify-center text-gray-400 text-xs">Carregando…</div>
             ) : (
-              <ResponsiveContainer width="100%" height={290}>
+              <ResponsiveContainer width="100%" height={168}>
                 <PieChart>
                   <Pie
                     data={dadosPorCentro}
@@ -148,9 +116,9 @@ export default function Laboratorios() {
                     nameKey="centro"
                     cx="40%"
                     cy="50%"
-                    outerRadius={110}
+                    outerRadius={70}
                     label={({ value, percent }) =>
-                      `${value} (${(percent * 100).toFixed(2).replace('.', ',')}%)`
+                      `${value} (${(percent * 100).toFixed(1).replace('.', ',')}%)`
                     }
                     labelLine
                   >
@@ -159,15 +127,8 @@ export default function Laboratorios() {
                     ))}
                   </Pie>
                   <Tooltip content={<TooltipGrafico total={totalPie} />} />
-                  <Legend
-                    layout="vertical"
-                    align="right"
-                    verticalAlign="middle"
-                    iconType="circle"
-                    iconSize={8}
-                    formatter={(value) => (
-                      <span style={{ fontSize: 11 }}>{value}</span>
-                    )}
+                  <Legend layout="vertical" align="right" verticalAlign="middle" iconType="circle" iconSize={7}
+                    formatter={(value) => <span style={{ fontSize: 10 }}>{value}</span>}
                   />
                 </PieChart>
               </ResponsiveContainer>
@@ -178,50 +139,27 @@ export default function Laboratorios() {
           </div>
         </div>
 
-        {/* Filtros — coluna direita */}
-        <div className="lg:w-52 flex-shrink-0">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm space-y-3 lg:sticky lg:top-4">
-            <div className="flex gap-2 items-end">
-              <FiltroSelect
-                label="Nome do laboratório"
-                value={filtroNome}
-                onChange={comReset(setFiltroNome)}
-                options={toOpts(opcoes.nomes)}
-                className="flex-1"
-              />
-              <BotaoLimparFiltros onClick={limparFiltros} />
-            </div>
-            <FiltroSelect
-              label="Centro/Campi"
-              value={filtroCentro}
-              onChange={comReset(setFiltroCentro)}
-              options={toOpts(opcoes.centros)}
-            />
+        {/* Filtros */}
+        <div className="w-44 flex-shrink-0">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-sm h-full space-y-2">
+            <FiltroSelect label="Laboratório" value={filtroNome}   onChange={setFiltroNome}   options={toOpts(opcoes.nomes)} />
+            <FiltroSelect label="Centro/Campi" value={filtroCentro} onChange={setFiltroCentro} options={toOpts(opcoes.centros)} />
+            <BotaoLimparFiltros onClick={limparFiltros} />
           </div>
         </div>
       </div>
 
-      {/* ── Tabela full-width ─────────────────────────────────────── */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+      {/* ── Tabela ── */}
+      <div className="flex-1 min-h-0 bg-white dark:bg-gray-800 rounded-xl p-3 shadow-sm flex flex-col">
+        <div className="flex items-center justify-between mb-2 flex-shrink-0">
+          <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-200">
             Informações dos Laboratórios
           </h3>
-          <BotaoExportarCSV
-            dados={labs}
-            nomeArquivo="laboratorios"
-            colunas={COLUNAS}
-          />
+          <BotaoExportarCSV dados={labs} nomeArquivo="laboratorios" colunas={COLUNAS} />
         </div>
-        <TabelaPaginada
-          colunas={COLUNAS}
-          dados={labs}
-          pagina={pagina}
-          totalPaginas={totalPaginas}
-          onAnterior={() => setPagina((p) => p - 1)}
-          onProxima={() => setPagina((p) => p + 1)}
-          loading={loadingTabela}
-        />
+        <div className="flex-1 min-h-0">
+          <TabelaPaginada colunas={COLUNAS} dados={labs} loading={loadingTabela} />
+        </div>
       </div>
     </div>
   )

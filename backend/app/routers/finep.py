@@ -8,12 +8,21 @@ from app.dependencies import get_db, verificar_autenticacao
 router = APIRouter(prefix="/finep", tags=["FINEP"])
 
 _PDI = models.ProjetoPDI
-# Filtro base: projetos PDI custeados pela FINEP (cobre "FINEP" e "FINEP/FUNARBE")
 _FINEP = _PDI.agencia_fomento.ilike("FINEP")
 
 
+def _filtrar_finep(q, ano_inicio=None, ano_termino=None, centro=None,
+                   natureza=None, situacao=None):
+    q = q.filter(_FINEP)
+    if ano_inicio:  q = q.filter(_PDI.ano_inicio == ano_inicio)
+    if ano_termino: q = q.filter(_PDI.ano_fim == ano_termino)
+    if centro:      q = q.filter(_PDI.centro.ilike(f"%{centro}%"))
+    if natureza:    q = q.filter(_PDI.natureza.ilike(f"%{natureza}%"))
+    if situacao:    q = q.filter(_PDI.situacao.ilike(f"%{situacao}%"))
+    return q
+
+
 # ── KPIs ─────────────────────────────────────────────────────────────────────
-# Fonte: projetos_finep (tabela dedicada com contratos formais FINEP)
 
 @router.get("/kpis")
 def finep_kpis(
@@ -27,8 +36,6 @@ def finep_kpis(
         "total_projetos": total,
     }
 
-
-# ── Filtros / agregações — Fonte: projetos_pdi WHERE agencia_fomento ilike FINEP ──
 
 @router.get("/filtros")
 def finep_filtros(
@@ -56,19 +63,20 @@ def finep_filtros(
     }
 
 
-# Rotas estáticas antes de /{id} para evitar captura pelo path param
 @router.get("/relacao-tipo")
 def finep_relacao_tipo(
+    ano_inicio:  int | None = Query(None),
+    ano_termino: int | None = Query(None),
+    centro:      str | None = Query(None),
+    natureza:    str | None = Query(None),
+    situacao:    str | None = Query(None),
     db: Session = Depends(get_db),
     _: dict = Depends(verificar_autenticacao),
 ):
-    """Agrupa por modalidade (interno/externo) — alimenta o gráfico donut."""
-    rows = (
-        db.query(_PDI.modalidade, func.count(_PDI.id).label("total"))
-        .filter(_FINEP, _PDI.modalidade != None)
-        .group_by(_PDI.modalidade)
-        .all()
-    )
+    q = db.query(_PDI.modalidade, func.count(_PDI.id).label("total"))
+    q = q.filter(_PDI.modalidade != None)
+    q = _filtrar_finep(q, ano_inicio, ano_termino, centro, natureza, situacao)
+    rows = q.group_by(_PDI.modalidade).all()
     agrupado: dict[str, int] = defaultdict(int)
     for r in rows:
         agrupado[r.modalidade.strip().title()] += r.total
@@ -80,14 +88,19 @@ def finep_relacao_tipo(
 
 @router.get("/por-centro")
 def finep_por_centro(
+    ano_inicio:  int | None = Query(None),
+    ano_termino: int | None = Query(None),
+    centro:      str | None = Query(None),
+    natureza:    str | None = Query(None),
+    situacao:    str | None = Query(None),
     db: Session = Depends(get_db),
     _: dict = Depends(verificar_autenticacao),
 ):
-    """Soma valor_total de projetos_pdi por centro, convertido para milhões."""
+    q = db.query(_PDI.centro, func.sum(_PDI.valor_total).label("valor_total"))
+    q = q.filter(_PDI.centro != None, _PDI.centro != "--")
+    q = _filtrar_finep(q, ano_inicio, ano_termino, centro, natureza, situacao)
     rows = (
-        db.query(_PDI.centro, func.sum(_PDI.valor_total).label("valor_total"))
-        .filter(_FINEP, _PDI.centro != None, _PDI.centro != "--")
-        .group_by(_PDI.centro)
+        q.group_by(_PDI.centro)
         .order_by(func.sum(_PDI.valor_total).desc())
         .all()
     )
@@ -99,22 +112,17 @@ def finep_por_centro(
 
 @router.get("", response_model=list[schemas.ProjetoPDIOut])
 def listar_finep(
-    ano_inicio: int | None = Query(None),
+    ano_inicio:  int | None = Query(None),
     ano_termino: int | None = Query(None),
-    centro: str | None = Query(None),
-    natureza: str | None = Query(None),
-    situacao: str | None = Query(None),
-    skip: int = Query(0, ge=0),
+    centro:      str | None = Query(None),
+    natureza:    str | None = Query(None),
+    situacao:    str | None = Query(None),
+    skip:  int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=100),
     db: Session = Depends(get_db),
     _: dict = Depends(verificar_autenticacao),
 ):
-    q = db.query(_PDI).filter(_FINEP)
-    if ano_inicio:  q = q.filter(_PDI.ano_inicio == ano_inicio)
-    if ano_termino: q = q.filter(_PDI.ano_fim == ano_termino)
-    if centro:      q = q.filter(_PDI.centro.ilike(f"%{centro}%"))
-    if natureza:    q = q.filter(_PDI.natureza.ilike(f"%{natureza}%"))
-    if situacao:    q = q.filter(_PDI.situacao.ilike(f"%{situacao}%"))
+    q = _filtrar_finep(db.query(_PDI), ano_inicio, ano_termino, centro, natureza, situacao)
     return q.offset(skip).limit(limit).all()
 
 
@@ -124,11 +132,7 @@ def detalhe_finep(
     db: Session = Depends(get_db),
     _: dict = Depends(verificar_autenticacao),
 ):
-    projeto = (
-        db.query(_PDI)
-        .filter(_PDI.id == id, _FINEP)
-        .first()
-    )
+    projeto = db.query(_PDI).filter(_PDI.id == id, _FINEP).first()
     if not projeto:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Projeto não encontrado")
     return projeto

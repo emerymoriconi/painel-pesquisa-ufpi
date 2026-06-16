@@ -9,6 +9,13 @@ router = APIRouter(prefix="/grupos", tags=["Grupos de Pesquisa"])
 _G = models.GrupoPesquisa
 
 
+def _filtrar_grupos(q, nome_grupo=None, area_predominante=None, ultimo_envio=None):
+    if nome_grupo:        q = q.filter(_G.nome_grupo.ilike(f"%{nome_grupo}%"))
+    if area_predominante: q = q.filter(_G.area_predominante.ilike(f"%{area_predominante}%"))
+    if ultimo_envio:      q = q.filter(_G.ultimo_envio.ilike(f"%{ultimo_envio}%"))
+    return q
+
+
 @router.get("/kpis")
 def grupos_kpis(
     db: Session = Depends(get_db),
@@ -39,16 +46,19 @@ def grupos_filtros(
     }
 
 
-# Rota estática antes de /{id}
 @router.get("/por-area")
 def grupos_por_area(
+    nome_grupo:        str | None = Query(None),
+    area_predominante: str | None = Query(None),
+    ultimo_envio:      str | None = Query(None),
     db: Session = Depends(get_db),
     _: dict = Depends(verificar_autenticacao),
 ):
+    q = db.query(_G.area_predominante, func.count(_G.id).label("total"))
+    q = q.filter(_G.area_predominante != None)
+    q = _filtrar_grupos(q, nome_grupo, area_predominante, ultimo_envio)
     rows = (
-        db.query(_G.area_predominante, func.count(_G.id).label("total"))
-        .filter(_G.area_predominante != None)
-        .group_by(_G.area_predominante)
+        q.group_by(_G.area_predominante)
         .order_by(func.count(_G.id).desc())
         .limit(10)
         .all()
@@ -56,22 +66,19 @@ def grupos_por_area(
     return [{"area": r.area_predominante, "total": r.total} for r in rows]
 
 
-@router.get("/", response_model=list[schemas.GrupoPesquisaOut])
+@router.get("", response_model=list[schemas.GrupoPesquisaOut])
 def listar_grupos(
-    nome_grupo: str | None = Query(None),
+    nome_grupo:        str | None = Query(None),
     area_predominante: str | None = Query(None),
-    ultimo_envio: str | None = Query(None),
-    situacao: str | None = Query(None),
-    skip: int = Query(0, ge=0),
-    limit: int = Query(20, ge=1, le=100),
+    ultimo_envio:      str | None = Query(None),
+    situacao:          str | None = Query(None),
+    skip:  int = Query(0, ge=0),
+    limit: int = Query(9999, ge=1, le=9999),
     db: Session = Depends(get_db),
     _: dict = Depends(verificar_autenticacao),
 ):
-    q = db.query(_G)
-    if nome_grupo:        q = q.filter(_G.nome_grupo.ilike(f"%{nome_grupo}%"))
-    if area_predominante: q = q.filter(_G.area_predominante.ilike(f"%{area_predominante}%"))
-    if ultimo_envio:      q = q.filter(_G.ultimo_envio.ilike(f"%{ultimo_envio}%"))
-    if situacao:          q = q.filter(_G.status.ilike(f"%{situacao}%"))
+    q = _filtrar_grupos(db.query(_G), nome_grupo, area_predominante, ultimo_envio)
+    if situacao: q = q.filter(_G.status.ilike(f"%{situacao}%"))
     return q.offset(skip).limit(limit).all()
 
 

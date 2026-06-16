@@ -13,8 +13,7 @@ import TabelaPaginada from '../components/TabelaPaginada'
 import TooltipGrafico from '../components/TooltipGrafico'
 import BotaoExportarCSV from '../components/BotaoExportarCSV'
 import BotaoExportarPNG from '../components/BotaoExportarPNG'
-
-const LIMITE = 20
+import { iconPosGraduacao } from '../assets/icons.js'
 
 const COLUNAS = [
   { key: 'programa', label: 'PROGRAMA' },
@@ -31,13 +30,7 @@ function TickRotacionado({ x, y, payload }) {
       : payload.value
   return (
     <g transform={`translate(${x},${y})`}>
-      <text
-        x={0} y={0} dy={12}
-        textAnchor="end"
-        fill="#6B7280"
-        fontSize={10}
-        transform="rotate(-35)"
-      >
+      <text x={0} y={0} dy={10} textAnchor="end" fill="#6B7280" fontSize={9} transform="rotate(-35)">
         {texto}
       </text>
     </g>
@@ -51,29 +44,25 @@ function toOpts(arr = []) {
 function CardPosGrad({ valor, loading }) {
   if (loading) return <SkeletonCard />
   return (
-    <div className="h-full bg-azul-escuro text-white rounded-xl px-6 py-10 flex flex-col items-center justify-center text-center">
-      <p className="text-lg font-bold uppercase tracking-wide opacity-80 leading-tight">
-        Pós-Graduação
-      </p>
-      <span className="text-4xl mt-3">🎓</span>
-      <p className="text-6xl font-bold mt-3">{valor ?? '—'}</p>
+    <div className="h-full bg-azul-escuro text-white rounded-xl px-4 py-4 flex flex-col items-center justify-center text-center">
+      <p className="text-xs font-bold uppercase tracking-wide opacity-80">Pós-Graduação</p>
+      <img src={iconPosGraduacao} alt="" className="w-7 h-7 object-contain mt-2 opacity-90" />
+      <p className="text-3xl font-bold mt-2">{valor ?? '—'}</p>
     </div>
   )
 }
 
 export default function PosGraduacao() {
-  const [kpis,          setKpis]          = useState({})
-  const [opcoes,        setOpcoes]        = useState({})
+  const [kpis,           setKpis]           = useState({})
+  const [opcoes,         setOpcoes]         = useState({})
   const [dadosPorCentro, setDadosPorCentro] = useState([])
-  const [programas,     setProgramas]     = useState([])
-  const [pagina,        setPagina]        = useState(1)
-  const [totalPaginas,  setTotalPaginas]  = useState(1)
+  const [programas,      setProgramas]      = useState([])
 
-  const [filtroPrograma,      setFiltroPrograma]      = useState('')
-  const [filtroConceito,      setFiltroConceito]      = useState('')
-  const [filtroCentro,        setFiltroCentro]        = useState('')
-  const [filtroNivel,         setFiltroNivel]         = useState('')
-  const [filtroTipo,          setFiltroTipo]          = useState('')
+  const [filtroPrograma, setFiltroPrograma] = useState('')
+  const [filtroConceito, setFiltroConceito] = useState('')
+  const [filtroCentro,   setFiltroCentro]   = useState('')
+  const [filtroNivel,    setFiltroNivel]    = useState('')
+  const [filtroTipo,     setFiltroTipo]     = useState('')
 
   const [loadingKpis,    setLoadingKpis]    = useState(true)
   const [loadingGrafico, setLoadingGrafico] = useState(true)
@@ -82,54 +71,30 @@ export default function PosGraduacao() {
   const refGrafico = useRef(null)
 
   const filtrosAtivos = {
-    programa:      filtroPrograma  || undefined,
-    conceito_capes: filtroConceito || undefined,
-    centro:        filtroCentro    || undefined,
-    nivel:         filtroNivel     || undefined,
-    tipo:          filtroTipo      || undefined,
+    programa:       filtroPrograma  || undefined,
+    conceito_capes: filtroConceito  || undefined,
+    centro:         filtroCentro    || undefined,
+    nivel:          filtroNivel     || undefined,
+    tipo:           filtroTipo      || undefined,
   }
 
-  // Dados estáticos — mount apenas
   useEffect(() => {
-    getKPIsPosGraduacao()
-      .then(setKpis)
-      .catch(() => {})
-      .finally(() => setLoadingKpis(false))
-
-    getFiltrosPosGraduacao()
-      .then(setOpcoes)
-      .catch(() => {})
+    getKPIsPosGraduacao().then(setKpis).catch(() => {}).finally(() => setLoadingKpis(false))
+    getFiltrosPosGraduacao().then(setOpcoes).catch(() => {})
   }, [])
 
-  // Gráfico — recarrega quando filtros mudam
   useEffect(() => {
     setLoadingGrafico(true)
-    getPosGraduacaoPorCentro(filtrosAtivos)
-      .then(setDadosPorCentro)
-      .catch(() => {})
-      .finally(() => setLoadingGrafico(false))
+    getPosGraduacaoPorCentro(filtrosAtivos).then(setDadosPorCentro).catch(() => {}).finally(() => setLoadingGrafico(false))
   }, [filtroPrograma, filtroConceito, filtroCentro, filtroNivel, filtroTipo]) // eslint-disable-line
 
-  // Tabela — recarrega quando filtros ou página mudam
   useEffect(() => {
     setLoadingTabela(true)
-    getPosGraduacao({ ...filtrosAtivos, skip: (pagina - 1) * LIMITE, limit: LIMITE })
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setProgramas(data)
-          setTotalPaginas(1)
-        } else {
-          setProgramas(data.items ?? [])
-          setTotalPaginas(Math.max(1, Math.ceil((data.total ?? 0) / LIMITE)))
-        }
-      })
+    getPosGraduacao({ ...filtrosAtivos, limit: 9999 })
+      .then((data) => setProgramas(Array.isArray(data) ? data : (data.items ?? [])))
       .catch(() => {})
       .finally(() => setLoadingTabela(false))
-  }, [filtroPrograma, filtroConceito, filtroCentro, filtroNivel, filtroTipo, pagina]) // eslint-disable-line
-
-  function comReset(setter) {
-    return (val) => { setter(val); setPagina(1) }
-  }
+  }, [filtroPrograma, filtroConceito, filtroCentro, filtroNivel, filtroTipo]) // eslint-disable-line
 
   function limparFiltros() {
     setFiltroPrograma('')
@@ -137,62 +102,39 @@ export default function PosGraduacao() {
     setFiltroCentro('')
     setFiltroNivel('')
     setFiltroTipo('')
-    setPagina(1)
   }
 
   return (
-    <div className="space-y-6">
+    <div className="h-full flex flex-col gap-3">
 
-      {/* ── Top: Card + Gráfico + Filtros ──────────────────────────── */}
-      <div className="flex flex-col lg:flex-row gap-4 items-stretch">
+      {/* ── Top: Card + Gráfico + Filtros ── */}
+      <div className="flex-shrink-0 flex gap-3 items-stretch" style={{ height: '230px' }}>
 
-        {/* Card único */}
-        <div className="lg:w-52 flex-shrink-0">
+        {/* Card */}
+        <div className="w-44 flex-shrink-0">
           <CardPosGrad valor={kpis.total_pos_graduacao} loading={loadingKpis} />
         </div>
 
-        {/* Gráfico de barras */}
-        <div className="flex-1 bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm">
+        {/* Gráfico */}
+        <div className="flex-1 bg-white dark:bg-gray-800 rounded-xl p-3 shadow-sm">
           <div ref={refGrafico}>
-            <h3 className="text-sm font-semibold text-center text-gray-700 dark:text-gray-200 mb-2">
+            <h3 className="text-xs font-semibold text-center text-gray-700 dark:text-gray-200 mb-1">
               Nº de Pós-graduação x Centro
             </h3>
             {loadingGrafico ? (
-              <div className="h-64 flex items-center justify-center text-gray-400 text-sm">
-                Carregando…
-              </div>
+              <div className="h-40 flex items-center justify-center text-gray-400 text-xs">Carregando…</div>
             ) : (
-              <ResponsiveContainer width="100%" height={290}>
-                <BarChart
-                  data={dadosPorCentro}
-                  margin={{ top: 16, right: 8, left: 0, bottom: 52 }}
-                >
+              <ResponsiveContainer width="100%" height={168}>
+                <BarChart data={dadosPorCentro} margin={{ top: 8, right: 8, left: 0, bottom: 40 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis
-                    dataKey="centro"
-                    tick={<TickRotacionado />}
-                    interval={0}
-                    label={{
-                      value: 'CENTRO',
-                      position: 'insideBottom',
-                      offset: -40,
-                      fontSize: 11,
-                      fill: '#6B7280',
-                    }}
+                  <XAxis dataKey="centro" tick={<TickRotacionado />} interval={0}
+                    label={{ value: 'CENTRO', position: 'insideBottom', offset: -30, fontSize: 9, fill: '#6B7280' }}
                   />
-                  <YAxis
-                    tick={{ fontSize: 11 }}
-                    label={{
-                      value: 'Contagem de Programas',
-                      angle: -90,
-                      position: 'insideLeft',
-                      offset: 12,
-                      fontSize: 10,
-                      fill: '#6B7280',
-                    }}
+                  <YAxis tick={{ fontSize: 10 }}
+                    label={{ value: 'Programas', angle: -90, position: 'insideLeft', offset: 10, fontSize: 9, fill: '#6B7280' }}
                   />
                   <Tooltip content={<TooltipGrafico />} />
-                  <Bar dataKey="total" fill="#2E5F8A" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="total" fill="#2E5F8A" radius={[3, 3, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             )}
@@ -202,69 +144,32 @@ export default function PosGraduacao() {
           </div>
         </div>
 
-        {/* Filtros — coluna direita */}
-        <div className="lg:w-56 flex-shrink-0">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm lg:sticky lg:top-4">
-            <div className="grid grid-cols-2 gap-3">
-              <FiltroSelect
-                label="Programa"
-                value={filtroPrograma}
-                onChange={comReset(setFiltroPrograma)}
-                options={toOpts(opcoes.programas)}
-              />
-              <FiltroSelect
-                label="Conceito CAPES"
-                value={filtroConceito}
-                onChange={comReset(setFiltroConceito)}
-                options={toOpts(opcoes.conceitos_capes)}
-              />
-              <FiltroSelect
-                label="Centro/Campi"
-                value={filtroCentro}
-                onChange={comReset(setFiltroCentro)}
-                options={toOpts(opcoes.centros)}
-              />
-              <FiltroSelect
-                label="Nível"
-                value={filtroNivel}
-                onChange={comReset(setFiltroNivel)}
-                options={toOpts(opcoes.niveis)}
-              />
-              <FiltroSelect
-                label="Tipo"
-                value={filtroTipo}
-                onChange={comReset(setFiltroTipo)}
-                options={toOpts(opcoes.tipos)}
-              />
-              <div className="flex items-end">
-                <BotaoLimparFiltros onClick={limparFiltros} />
-              </div>
+        {/* Filtros */}
+        <div className="w-52 flex-shrink-0">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-sm h-full">
+            <div className="grid grid-cols-2 gap-2">
+              <FiltroSelect label="Programa"      value={filtroPrograma} onChange={setFiltroPrograma} options={toOpts(opcoes.programas)} />
+              <FiltroSelect label="Conceito CAPES" value={filtroConceito} onChange={setFiltroConceito} options={toOpts(opcoes.conceitos_capes)} />
+              <FiltroSelect label="Centro/Campi"  value={filtroCentro}   onChange={setFiltroCentro}   options={toOpts(opcoes.centros)} />
+              <FiltroSelect label="Nível"         value={filtroNivel}    onChange={setFiltroNivel}    options={toOpts(opcoes.niveis)} />
+              <FiltroSelect label="Tipo"          value={filtroTipo}     onChange={setFiltroTipo}     options={toOpts(opcoes.tipos)} />
+              <div className="flex items-end"><BotaoLimparFiltros onClick={limparFiltros} /></div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* ── Tabela full-width ─────────────────────────────────────── */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+      {/* ── Tabela ── */}
+      <div className="flex-1 min-h-0 bg-white dark:bg-gray-800 rounded-xl p-3 shadow-sm flex flex-col">
+        <div className="flex items-center justify-between mb-2 flex-shrink-0">
+          <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-200">
             Informações dos Programas de Pós-Graduação
           </h3>
-          <BotaoExportarCSV
-            dados={programas}
-            nomeArquivo="pos_graduacao"
-            colunas={COLUNAS}
-          />
+          <BotaoExportarCSV dados={programas} nomeArquivo="pos_graduacao" colunas={COLUNAS} />
         </div>
-        <TabelaPaginada
-          colunas={COLUNAS}
-          dados={programas}
-          pagina={pagina}
-          totalPaginas={totalPaginas}
-          onAnterior={() => setPagina((p) => p - 1)}
-          onProxima={() => setPagina((p) => p + 1)}
-          loading={loadingTabela}
-        />
+        <div className="flex-1 min-h-0">
+          <TabelaPaginada colunas={COLUNAS} dados={programas} loading={loadingTabela} />
+        </div>
       </div>
     </div>
   )

@@ -9,6 +9,15 @@ router = APIRouter(prefix="/pos-graduacao", tags=["Pós-Graduação"])
 _P = models.PosGraduacao
 
 
+def _filtrar_pos(q, programa=None, conceito_capes=None, centro=None, nivel=None, tipo=None):
+    if programa:       q = q.filter(_P.programa.ilike(f"%{programa}%"))
+    if conceito_capes: q = q.filter(_P.conceito_capes == conceito_capes)
+    if centro:         q = q.filter(_P.centro.ilike(f"%{centro}%"))
+    if nivel:          q = q.filter(_P.nivel.ilike(f"%{nivel}%"))
+    if tipo:           q = q.filter(_P.tipo.ilike(f"%{tipo}%"))
+    return q
+
+
 @router.get("/kpis")
 def pos_kpis(
     db: Session = Depends(get_db),
@@ -44,40 +53,36 @@ def pos_filtros(
     }
 
 
-# Rota estática antes de /{id}
 @router.get("/por-centro")
 def pos_por_centro(
+    programa:       str | None = Query(None),
+    conceito_capes: int | None = Query(None),
+    centro:         str | None = Query(None),
+    nivel:          str | None = Query(None),
+    tipo:           str | None = Query(None),
     db: Session = Depends(get_db),
     _: dict = Depends(verificar_autenticacao),
 ):
-    rows = (
-        db.query(_P.centro, func.count(_P.id).label("total"))
-        .filter(_P.centro != None)
-        .group_by(_P.centro)
-        .order_by(func.count(_P.id).desc())
-        .all()
-    )
+    q = db.query(_P.centro, func.count(_P.id).label("total"))
+    q = q.filter(_P.centro != None)
+    q = _filtrar_pos(q, programa, conceito_capes, centro, nivel, tipo)
+    rows = q.group_by(_P.centro).order_by(func.count(_P.id).desc()).all()
     return [{"centro": r.centro, "total": r.total} for r in rows]
 
 
-@router.get("/", response_model=list[schemas.PosGraduacaoOut])
+@router.get("", response_model=list[schemas.PosGraduacaoOut])
 def listar_pos(
-    programa: str | None = Query(None),
+    programa:       str | None = Query(None),
     conceito_capes: int | None = Query(None),
-    centro: str | None = Query(None),
-    nivel: str | None = Query(None),
-    tipo: str | None = Query(None),
-    skip: int = Query(0, ge=0),
-    limit: int = Query(20, ge=1, le=100),
+    centro:         str | None = Query(None),
+    nivel:          str | None = Query(None),
+    tipo:           str | None = Query(None),
+    skip:  int = Query(0, ge=0),
+    limit: int = Query(9999, ge=1, le=9999),
     db: Session = Depends(get_db),
     _: dict = Depends(verificar_autenticacao),
 ):
-    q = db.query(_P)
-    if programa:       q = q.filter(_P.programa.ilike(f"%{programa}%"))
-    if conceito_capes: q = q.filter(_P.conceito_capes == conceito_capes)
-    if centro:         q = q.filter(_P.centro.ilike(f"%{centro}%"))
-    if nivel:          q = q.filter(_P.nivel.ilike(f"%{nivel}%"))
-    if tipo:           q = q.filter(_P.tipo.ilike(f"%{tipo}%"))
+    q = _filtrar_pos(db.query(_P), programa, conceito_capes, centro, nivel, tipo)
     return q.offset(skip).limit(limit).all()
 
 

@@ -9,6 +9,12 @@ router = APIRouter(prefix="/laboratorios", tags=["Laboratórios"])
 _L = models.Laboratorio
 
 
+def _filtrar_laboratorios(q, nome=None, centro_campi=None):
+    if nome:        q = q.filter(_L.nome.ilike(f"%{nome}%"))
+    if centro_campi: q = q.filter(_L.centro_campi.ilike(f"%{centro_campi}%"))
+    return q
+
+
 @router.get("/kpis")
 def laboratorios_kpis(
     db: Session = Depends(get_db),
@@ -38,34 +44,30 @@ def laboratorios_filtros(
     }
 
 
-# Rota estática antes de /{id}
 @router.get("/por-centro")
 def laboratorios_por_centro(
+    nome:        str | None = Query(None),
+    centro_campi: str | None = Query(None),
     db: Session = Depends(get_db),
     _: dict = Depends(verificar_autenticacao),
 ):
     label = func.coalesce(func.nullif(_L.centro_campi, ""), "Em branco")
-    rows = (
-        db.query(label.label("centro"), func.count(_L.id).label("total"))
-        .group_by(label)
-        .order_by(func.count(_L.id).desc())
-        .all()
-    )
+    q = db.query(label.label("centro"), func.count(_L.id).label("total"))
+    q = _filtrar_laboratorios(q, nome, centro_campi)
+    rows = q.group_by(label).order_by(func.count(_L.id).desc()).all()
     return [{"centro": r.centro, "total": r.total} for r in rows]
 
 
-@router.get("/", response_model=list[schemas.LaboratorioOut])
+@router.get("", response_model=list[schemas.LaboratorioOut])
 def listar_laboratorios(
-    nome: str | None = Query(None),
+    nome:        str | None = Query(None),
     centro_campi: str | None = Query(None),
-    skip: int = Query(0, ge=0),
-    limit: int = Query(20, ge=1, le=100),
+    skip:  int = Query(0, ge=0),
+    limit: int = Query(9999, ge=1, le=9999),
     db: Session = Depends(get_db),
     _: dict = Depends(verificar_autenticacao),
 ):
-    q = db.query(_L)
-    if nome:        q = q.filter(_L.nome.ilike(f"%{nome}%"))
-    if centro_campi: q = q.filter(_L.centro_campi.ilike(f"%{centro_campi}%"))
+    q = _filtrar_laboratorios(db.query(_L), nome, centro_campi)
     return q.offset(skip).limit(limit).all()
 
 

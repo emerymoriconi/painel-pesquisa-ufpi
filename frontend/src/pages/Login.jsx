@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import LoadingSpinner from '../components/LoadingSpinner'
 
@@ -39,11 +39,6 @@ export default function Login() {
 
         {/* Formulário */}
         <form onSubmit={handleSubmit} className="px-8 py-8 space-y-5">
-          {erro && (
-            <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
-              {erro}
-            </div>
-          )}
 
           <div className="flex flex-col gap-1.5">
             <label
@@ -95,7 +90,24 @@ export default function Login() {
               'Entrar'
             )}
           </button>
+
+          {erro && (
+            <p className="text-red-500 text-xs text-center">{erro}</p>
+          )}
         </form>
+
+        {/* Rodapé */}
+        <div className="px-8 pb-7 text-center">
+          <p className="text-sm text-gray-500">
+            Não tem cadastro?{' '}
+            <Link
+              to="/cadastro"
+              className="text-azul-medio font-medium hover:underline"
+            >
+              Cadastre-se agora
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   )

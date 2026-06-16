@@ -1,18 +1,22 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
+import {
+  iconProjetos, iconFomento, iconBolsistas, iconNucleos,
+  iconGrupos, iconIncubadas, iconPosGraduacao, iconLaboratorios,
+} from '../assets/icons.js'
 
 const links = [
-  { to: '/',                     label: 'Geral',                icone: '🏠', end: true },
-  { to: '/projetos-pdi',         label: 'Projetos PD&I',        icone: '📋' },
-  { to: '/projetos-finep',       label: 'Projetos FINEP',       icone: '💰' },
-  { to: '/producao-intelectual', label: 'Produção Intelectual', icone: '💡' },
-  { to: '/bolsistas',            label: 'Bolsistas',            icone: '🎓' },
-  { to: '/nucleos',              label: 'Núcleos de Pesquisa',  icone: '⚛️' },
-  { to: '/grupos',               label: 'Grupos de Pesquisa',   icone: '👥' },
-  { to: '/incubadas',            label: 'Empresas Incubadas',   icone: '🚀' },
-  { to: '/pos-graduacao',        label: 'Pós-Graduação',        icone: '🎓' },
-  { to: '/laboratorios',         label: 'Laboratórios',         icone: '🔬' },
+  { to: '/',                     label: 'Geral',                icone: null,               end: true },
+  { to: '/projetos-pdi',         label: 'Projetos PD&I',        icone: iconProjetos },
+  { to: '/projetos-finep',       label: 'Projetos FINEP',       icone: iconFomento },
+  { to: '/producao-intelectual', label: 'Produção Intelectual', icone: null },
+  { to: '/bolsistas',            label: 'Bolsistas',            icone: iconBolsistas },
+  { to: '/nucleos',              label: 'Núcleos de Pesquisa',  icone: iconNucleos },
+  { to: '/grupos',               label: 'Grupos de Pesquisa',   icone: iconGrupos },
+  { to: '/incubadas',            label: 'Empresas Incubadas',   icone: iconIncubadas },
+  { to: '/pos-graduacao',        label: 'Pós-Graduação',        icone: iconPosGraduacao },
+  { to: '/laboratorios',         label: 'Laboratórios',         icone: iconLaboratorios },
 ]
 
 const linkClass = ({ isActive }) =>
@@ -68,7 +72,10 @@ export default function Sidebar({ isOpen, onClose }) {
               className={linkClass}
               onClick={onClose}
             >
-              <span>{icone}</span>
+              {icone
+                ? <img src={icone} alt="" className="w-5 h-5 object-contain shrink-0" />
+                : <span className="w-5 h-5 shrink-0" />
+              }
               <span>{label}</span>
             </NavLink>
           ))}

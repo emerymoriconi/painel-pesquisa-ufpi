@@ -9,6 +9,15 @@ router = APIRouter(prefix="/nucleos", tags=["Núcleos de Pesquisa"])
 _N = models.NucleoPesquisa
 
 
+def _filtrar_nucleos(q, centro_campus=None, vinculacao=None,
+                     ano_resolucao=None, denominacao=None):
+    if centro_campus: q = q.filter(_N.centro_campus.ilike(f"%{centro_campus}%"))
+    if vinculacao:    q = q.filter(_N.vinculacao.ilike(f"%{vinculacao}%"))
+    if ano_resolucao: q = q.filter(_N.ano_resolucao == ano_resolucao)
+    if denominacao:   q = q.filter(_N.denominacao.ilike(f"%{denominacao}%"))
+    return q
+
+
 @router.get("/kpis")
 def nucleos_kpis(
     db: Session = Depends(get_db),
@@ -57,40 +66,36 @@ def nucleos_filtros(
     }
 
 
-# Rota estática antes de /{id}
 @router.get("/por-centro")
 def nucleos_por_centro(
+    centro_campus: str | None = Query(None),
+    vinculacao:    str | None = Query(None),
+    ano_resolucao: int | None = Query(None),
+    denominacao:   str | None = Query(None),
     db: Session = Depends(get_db),
     _: dict = Depends(verificar_autenticacao),
 ):
-    rows = (
-        db.query(_N.centro_campus, func.count(_N.id).label("total"))
-        .filter(_N.centro_campus != None, _N.centro_campus != "--")
-        .group_by(_N.centro_campus)
-        .order_by(func.count(_N.id).desc())
-        .all()
-    )
+    q = db.query(_N.centro_campus, func.count(_N.id).label("total"))
+    q = q.filter(_N.centro_campus != None, _N.centro_campus != "--")
+    q = _filtrar_nucleos(q, centro_campus, vinculacao, ano_resolucao, denominacao)
+    rows = q.group_by(_N.centro_campus).order_by(func.count(_N.id).desc()).all()
     return [{"centro": r.centro_campus, "total": r.total} for r in rows]
 
 
-@router.get("/", response_model=list[schemas.NucleoPesquisaOut])
+@router.get("", response_model=list[schemas.NucleoPesquisaOut])
 def listar_nucleos(
     centro_campus: str | None = Query(None),
-    vinculacao: str | None = Query(None),
+    vinculacao:    str | None = Query(None),
     ano_resolucao: int | None = Query(None),
-    denominacao: str | None = Query(None),
-    situacao: str | None = Query(None),
-    skip: int = Query(0, ge=0),
-    limit: int = Query(20, ge=1, le=100),
+    denominacao:   str | None = Query(None),
+    situacao:      str | None = Query(None),
+    skip:  int = Query(0, ge=0),
+    limit: int = Query(9999, ge=1, le=9999),
     db: Session = Depends(get_db),
     _: dict = Depends(verificar_autenticacao),
 ):
-    q = db.query(_N)
-    if centro_campus:  q = q.filter(_N.centro_campus.ilike(f"%{centro_campus}%"))
-    if vinculacao:     q = q.filter(_N.vinculacao.ilike(f"%{vinculacao}%"))
-    if ano_resolucao:  q = q.filter(_N.ano_resolucao == ano_resolucao)
-    if denominacao:    q = q.filter(_N.denominacao.ilike(f"%{denominacao}%"))
-    if situacao:       q = q.filter(_N.situacao.ilike(f"%{situacao}%"))
+    q = _filtrar_nucleos(db.query(_N), centro_campus, vinculacao, ano_resolucao, denominacao)
+    if situacao: q = q.filter(_N.situacao.ilike(f"%{situacao}%"))
     return q.offset(skip).limit(limit).all()
 
 

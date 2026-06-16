@@ -9,6 +9,12 @@ router = APIRouter(prefix="/incubadas", tags=["Empresas Incubadas"])
 _E = models.EmpresaIncubada
 
 
+def _filtrar_incubadas(q, incubadora=None, situacao=None):
+    if incubadora: q = q.filter(_E.incubadora.ilike(f"%{incubadora}%"))
+    if situacao:   q = q.filter(_E.tipo_empresa.ilike(f"%{situacao}%"))
+    return q
+
+
 @router.get("/kpis")
 def incubadas_kpis(
     db: Session = Depends(get_db),
@@ -30,9 +36,9 @@ def incubadas_kpis(
         .scalar() or 0
     )
     return {
-        "total_incubadas":    total_incubadas,
-        "total_graduadas":    graduadas,
-        "total_incubadoras":  total_incubadoras,
+        "total_incubadas":   total_incubadas,
+        "total_graduadas":   graduadas,
+        "total_incubadoras": total_incubadoras,
     }
 
 
@@ -52,34 +58,30 @@ def incubadas_filtros(
     }
 
 
-# Rota estática antes de /{id}
 @router.get("/por-incubadora")
 def incubadas_por_incubadora(
+    incubadora: str | None = Query(None),
+    situacao:   str | None = Query(None),
     db: Session = Depends(get_db),
     _: dict = Depends(verificar_autenticacao),
 ):
-    rows = (
-        db.query(_E.incubadora, func.count(_E.id).label("total"))
-        .filter(_E.incubadora != None)
-        .group_by(_E.incubadora)
-        .order_by(func.count(_E.id).desc())
-        .all()
-    )
+    q = db.query(_E.incubadora, func.count(_E.id).label("total"))
+    q = q.filter(_E.incubadora != None)
+    q = _filtrar_incubadas(q, incubadora, situacao)
+    rows = q.group_by(_E.incubadora).order_by(func.count(_E.id).desc()).all()
     return [{"incubadora": r.incubadora, "total": r.total} for r in rows]
 
 
-@router.get("/", response_model=list[schemas.EmpresaIncubadaOut])
+@router.get("", response_model=list[schemas.EmpresaIncubadaOut])
 def listar_incubadas(
     incubadora: str | None = Query(None),
-    situacao: str | None = Query(None),
-    skip: int = Query(0, ge=0),
-    limit: int = Query(20, ge=1, le=100),
+    situacao:   str | None = Query(None),
+    skip:  int = Query(0, ge=0),
+    limit: int = Query(9999, ge=1, le=9999),
     db: Session = Depends(get_db),
     _: dict = Depends(verificar_autenticacao),
 ):
-    q = db.query(_E)
-    if incubadora: q = q.filter(_E.incubadora.ilike(f"%{incubadora}%"))
-    if situacao:   q = q.filter(_E.tipo_empresa.ilike(f"%{situacao}%"))
+    q = _filtrar_incubadas(db.query(_E), incubadora, situacao)
     return q.offset(skip).limit(limit).all()
 
 

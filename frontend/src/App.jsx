@@ -12,6 +12,7 @@ import GruposPesquisa from './pages/GruposPesquisa'
 import EmpresasIncubadas from './pages/EmpresasIncubadas'
 import PosGraduacao from './pages/PosGraduacao'
 import Laboratorios from './pages/Laboratorios'
+import Cadastro from './pages/Cadastro'
 
 function RotaProtegida({ children }) {
   const { token } = useAuth()
@@ -23,6 +24,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/cadastro" element={<Cadastro />} />
         <Route
           path="/"
           element={

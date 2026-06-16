@@ -15,8 +15,7 @@ import TabelaPaginada from '../components/TabelaPaginada'
 import TooltipGrafico from '../components/TooltipGrafico'
 import BotaoExportarCSV from '../components/BotaoExportarCSV'
 import BotaoExportarPNG from '../components/BotaoExportarPNG'
-
-const LIMITE = 20
+import { iconConcluidos, iconEmAndamento } from '../assets/icons.js'
 
 const COLUNAS = [
   { key: 'area',        label: 'ÁREA DO CONHECIMENTO' },
@@ -27,28 +26,20 @@ const COLUNAS = [
   { key: 'situacao',    label: 'SITUAÇÃO' },
 ]
 
-// Tick do eixo X com rótulo rotacionado e truncado
 function TickRotacionado({ x, y, payload }) {
   const texto =
-    typeof payload.value === 'string' && payload.value.length > 15
-      ? payload.value.slice(0, 15) + '…'
+    typeof payload.value === 'string' && payload.value.length > 12
+      ? payload.value.slice(0, 12) + '…'
       : payload.value
   return (
     <g transform={`translate(${x},${y})`}>
-      <text
-        x={0} y={0} dy={12}
-        textAnchor="end"
-        fill="#6B7280"
-        fontSize={10}
-        transform="rotate(-35)"
-      >
+      <text x={0} y={0} dy={10} textAnchor="end" fill="#6B7280" fontSize={9} transform="rotate(-35)">
         {texto}
       </text>
     </g>
   )
 }
 
-// Formata valores grandes como "1,2 Mil"
 function formatarEixoY(v) {
   if (v >= 1000) return `${(v / 1000).toFixed(1).replace('.', ',')} Mil`
   return String(v)
@@ -59,13 +50,11 @@ function toOpts(arr = []) {
 }
 
 export default function ProjetosPDI() {
-  const [kpis,          setKpis]          = useState({})
-  const [opcoes,        setOpcoes]        = useState({})
-  const [dadosPorArea,  setDadosPorArea]  = useState([])
+  const [kpis,           setKpis]           = useState({})
+  const [opcoes,         setOpcoes]         = useState({})
+  const [dadosPorArea,   setDadosPorArea]   = useState([])
   const [dadosPorCentro, setDadosPorCentro] = useState([])
-  const [projetos,      setProjetos]      = useState([])
-  const [pagina,        setPagina]        = useState(1)
-  const [totalPaginas,  setTotalPaginas]  = useState(1)
+  const [projetos,       setProjetos]       = useState([])
 
   const [filtroAnoInicio,  setFiltroAnoInicio]  = useState('')
   const [filtroAnoTermino, setFiltroAnoTermino] = useState('')
@@ -90,53 +79,26 @@ export default function ProjetosPDI() {
     situacao:    filtroSituacao   || undefined,
   }
 
-  // KPIs + opções de filtro — somente no mount
   useEffect(() => {
-    getKPIsProjetosPDI()
-      .then(setKpis)
-      .catch(() => {})
-      .finally(() => setLoadingKpis(false))
-
-    getFiltrosPDI()
-      .then(setOpcoes)
-      .catch(() => {})
+    getKPIsProjetosPDI().then(setKpis).catch(() => {}).finally(() => setLoadingKpis(false))
+    getFiltrosPDI().then(setOpcoes).catch(() => {})
   }, [])
 
-  // Gráficos — recarrega quando filtros mudam
   useEffect(() => {
     setLoadingGraficos(true)
-    Promise.all([
-      getPorAreaPDI(filtrosAtivos),
-      getPorCentroPDI(filtrosAtivos),
-    ])
-      .then(([area, centro]) => {
-        setDadosPorArea(area)
-        setDadosPorCentro(centro)
-      })
+    Promise.all([getPorAreaPDI(filtrosAtivos), getPorCentroPDI(filtrosAtivos)])
+      .then(([area, centro]) => { setDadosPorArea(area); setDadosPorCentro(centro) })
       .catch(() => {})
       .finally(() => setLoadingGraficos(false))
   }, [filtroAnoInicio, filtroAnoTermino, filtroCentro, filtroNatureza, filtroArea, filtroSituacao]) // eslint-disable-line
 
-  // Tabela — recarrega quando filtros ou página mudam
   useEffect(() => {
     setLoadingTabela(true)
-    getProjetosPDI({ ...filtrosAtivos, skip: (pagina - 1) * LIMITE, limit: LIMITE })
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setProjetos(data)
-          setTotalPaginas(1)
-        } else {
-          setProjetos(data.items ?? [])
-          setTotalPaginas(Math.max(1, Math.ceil((data.total ?? 0) / LIMITE)))
-        }
-      })
+    getProjetosPDI({ ...filtrosAtivos, limit: 9999 })
+      .then((data) => setProjetos(Array.isArray(data) ? data : (data.items ?? [])))
       .catch(() => {})
       .finally(() => setLoadingTabela(false))
-  }, [filtroAnoInicio, filtroAnoTermino, filtroCentro, filtroNatureza, filtroArea, filtroSituacao, pagina]) // eslint-disable-line
-
-  function comReset(setter) {
-    return (val) => { setter(val); setPagina(1) }
-  }
+  }, [filtroAnoInicio, filtroAnoTermino, filtroCentro, filtroNatureza, filtroArea, filtroSituacao]) // eslint-disable-line
 
   function limparFiltros() {
     setFiltroAnoInicio('')
@@ -145,181 +107,106 @@ export default function ProjetosPDI() {
     setFiltroNatureza('')
     setFiltroArea('')
     setFiltroSituacao('')
-    setPagina(1)
   }
 
   return (
-    <div className="space-y-6">
+    <div className="h-full flex flex-col gap-3">
 
-      {/* ── Linha 1: KPI Cards + Filtros ───────────────────────────── */}
-      <div className="flex flex-col lg:flex-row gap-4">
+      {/* ── Linha 1: KPI Cards + Filtros ── */}
+      <div className="flex-shrink-0 flex gap-3">
 
         {/* Cards */}
-        <div className="grid grid-cols-2 gap-4 lg:w-72 flex-shrink-0">
+        <div className="grid grid-cols-2 gap-3 w-56 flex-shrink-0">
           {loadingKpis ? (
-            <>
-              <SkeletonCard />
-              <SkeletonCard />
-            </>
+            <><SkeletonCard /><SkeletonCard /></>
           ) : (
             <>
-              <CardMetrica
-                titulo="Projetos Concluídos"
-                valor={kpis.total_concluidos}
-                icone="✅"
-              />
-              <CardMetrica
-                titulo="Projetos em Andamento"
-                valor={kpis.total_em_andamento}
-                icone="⚙️"
-              />
+              <CardMetrica titulo="Concluídos"    valor={kpis.total_concluidos}   icone={iconConcluidos} />
+              <CardMetrica titulo="Em Andamento"  valor={kpis.total_em_andamento} icone={iconEmAndamento} />
             </>
           )}
         </div>
 
         {/* Filtros */}
-        <div className="flex-1 bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm">
-          <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3">
-            <FiltroSelect
-              label="Ano de Início"
-              value={filtroAnoInicio}
-              onChange={comReset(setFiltroAnoInicio)}
-              options={toOpts(opcoes.anos_inicio)}
-            />
-            <FiltroSelect
-              label="Centro/Campi"
-              value={filtroCentro}
-              onChange={comReset(setFiltroCentro)}
-              options={toOpts(opcoes.centros)}
-            />
-            <FiltroSelect
-              label="Natureza"
-              value={filtroNatureza}
-              onChange={comReset(setFiltroNatureza)}
-              options={toOpts(opcoes.naturezas)}
-            />
-            {/* Limpar ocupa a 4ª coluna no xl, linha abaixo nos menores */}
-            <div className="flex items-end">
-              <BotaoLimparFiltros onClick={limparFiltros} />
-            </div>
-            <FiltroSelect
-              label="Ano de Término"
-              value={filtroAnoTermino}
-              onChange={comReset(setFiltroAnoTermino)}
-              options={toOpts(opcoes.anos_termino)}
-            />
-            <FiltroSelect
-              label="Área do Conhecimento"
-              value={filtroArea}
-              onChange={comReset(setFiltroArea)}
-              options={toOpts(opcoes.areas)}
-            />
-            <FiltroSelect
-              label="Situação"
-              value={filtroSituacao}
-              onChange={comReset(setFiltroSituacao)}
-              options={toOpts(opcoes.situacoes)}
-            />
+        <div className="flex-1 bg-white dark:bg-gray-800 rounded-xl p-3 shadow-sm">
+          <div className="grid grid-cols-3 xl:grid-cols-4 gap-2">
+            <FiltroSelect label="Ano Início"   value={filtroAnoInicio}  onChange={setFiltroAnoInicio}  options={toOpts(opcoes.anos_inicio)} />
+            <FiltroSelect label="Ano Término"  value={filtroAnoTermino} onChange={setFiltroAnoTermino} options={toOpts(opcoes.anos_termino)} />
+            <FiltroSelect label="Centro/Campi" value={filtroCentro}     onChange={setFiltroCentro}     options={toOpts(opcoes.centros)} />
+            <FiltroSelect label="Natureza"     value={filtroNatureza}   onChange={setFiltroNatureza}   options={toOpts(opcoes.naturezas)} />
+            <FiltroSelect label="Área"         value={filtroArea}       onChange={setFiltroArea}       options={toOpts(opcoes.areas)} />
+            <FiltroSelect label="Situação"     value={filtroSituacao}   onChange={setFiltroSituacao}   options={toOpts(opcoes.situacoes)} />
+            <div className="flex items-end"><BotaoLimparFiltros onClick={limparFiltros} /></div>
           </div>
         </div>
       </div>
 
-      {/* ── Linha 2: Gráficos (esq) + Tabela (dir) ──────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* ── Linha 2: Gráficos + Tabela ── */}
+      <div className="flex-1 min-h-0 grid grid-cols-2 gap-3">
 
         {/* Coluna de gráficos */}
-        <div className="space-y-6">
+        <div className="flex flex-col gap-3 min-h-0">
 
-          {/* Gráfico: Área do Conhecimento */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-sm">
             <div ref={refGraficoArea}>
-              <h3 className="text-sm font-semibold text-center text-gray-700 dark:text-gray-200 mb-3">
+              <h3 className="text-xs font-semibold text-center text-gray-700 dark:text-gray-200 mb-2">
                 Nº de Projetos x Área do Conhecimento
               </h3>
               {loadingGraficos ? (
-                <div className="h-56 flex items-center justify-center text-gray-400 text-sm">
-                  Carregando…
-                </div>
+                <div className="h-40 flex items-center justify-center text-gray-400 text-xs">Carregando…</div>
               ) : (
-                <ResponsiveContainer width="100%" height={260}>
-                  <BarChart
-                    data={dadosPorArea}
-                    margin={{ top: 16, right: 8, left: 0, bottom: 60 }}
-                  >
+                <ResponsiveContainer width="100%" height={180}>
+                  <BarChart data={dadosPorArea} margin={{ top: 8, right: 8, left: 0, bottom: 48 }}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                    <XAxis
-                      dataKey="area"
-                      tick={<TickRotacionado />}
-                      interval={0}
-                    />
-                    <YAxis tick={{ fontSize: 11 }} />
+                    <XAxis dataKey="area" tick={<TickRotacionado />} interval={0} />
+                    <YAxis tick={{ fontSize: 10 }} />
                     <Tooltip content={<TooltipGrafico />} />
-                    <Bar dataKey="total" fill="#1E3A5F" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="total" fill="#1E3A5F" radius={[3, 3, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               )}
             </div>
-            <div className="flex justify-end mt-2">
+            <div className="flex justify-end mt-1">
               <BotaoExportarPNG refGrafico={refGraficoArea} nomeArquivo="projetos_por_area" />
             </div>
           </div>
 
-          {/* Gráfico: Centros/Campus */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-sm">
             <div ref={refGraficoCentro}>
-              <h3 className="text-sm font-semibold text-center text-gray-700 dark:text-gray-200 mb-3">
+              <h3 className="text-xs font-semibold text-center text-gray-700 dark:text-gray-200 mb-2">
                 Nº de Projetos x Centros/Campus
               </h3>
               {loadingGraficos ? (
-                <div className="h-56 flex items-center justify-center text-gray-400 text-sm">
-                  Carregando…
-                </div>
+                <div className="h-40 flex items-center justify-center text-gray-400 text-xs">Carregando…</div>
               ) : (
-                <ResponsiveContainer width="100%" height={260}>
-                  <BarChart
-                    data={dadosPorCentro}
-                    margin={{ top: 16, right: 8, left: 0, bottom: 60 }}
-                  >
+                <ResponsiveContainer width="100%" height={180}>
+                  <BarChart data={dadosPorCentro} margin={{ top: 8, right: 8, left: 0, bottom: 48 }}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                    <XAxis
-                      dataKey="centro"
-                      tick={<TickRotacionado />}
-                      interval={0}
-                    />
-                    <YAxis tickFormatter={formatarEixoY} tick={{ fontSize: 11 }} />
+                    <XAxis dataKey="centro" tick={<TickRotacionado />} interval={0} />
+                    <YAxis tickFormatter={formatarEixoY} tick={{ fontSize: 10 }} />
                     <Tooltip content={<TooltipGrafico />} />
-                    <Bar dataKey="total" fill="#1E3A5F" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="total" fill="#1E3A5F" radius={[3, 3, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               )}
             </div>
-            <div className="flex justify-end mt-2">
+            <div className="flex justify-end mt-1">
               <BotaoExportarPNG refGrafico={refGraficoCentro} nomeArquivo="projetos_por_centro" />
             </div>
           </div>
         </div>
 
         {/* Tabela */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-sm flex flex-col min-h-0">
+          <div className="flex items-center justify-between mb-2 flex-shrink-0">
+            <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-200">
               Informações dos Projetos de Pesquisas
             </h3>
-            <BotaoExportarCSV
-              dados={projetos}
-              nomeArquivo="projetos_pdi"
-              colunas={COLUNAS}
-            />
+            <BotaoExportarCSV dados={projetos} nomeArquivo="projetos_pdi" colunas={COLUNAS} />
           </div>
-          <TabelaPaginada
-            colunas={COLUNAS}
-            dados={projetos}
-            pagina={pagina}
-            totalPaginas={totalPaginas}
-            onAnterior={() => setPagina((p) => p - 1)}
-            onProxima={() => setPagina((p) => p + 1)}
-            loading={loadingTabela}
-          />
+          <div className="flex-1 min-h-0">
+            <TabelaPaginada colunas={COLUNAS} dados={projetos} loading={loadingTabela} />
+          </div>
         </div>
       </div>
     </div>
