@@ -57,7 +57,7 @@ O Painel de Pesquisa, Desenvolvimento e Inovação da UFPI é uma aplicação we
 | ID | Descrição |
 |----|-----------|
 | RF02.1 | O sistema deve exibir 9 cards de KPIs na página Home: Projetos PD&I, Projetos FINEP (valor em Mi), Produção Intelectual, Bolsistas, Núcleos, Grupos, Empresas Incubadas, Pós-Graduação e Laboratórios. |
-| RF02.2 | O card de Projetos FINEP deve exibir o valor total em milhões (ex: `195,78 Mi`), não a contagem de registros. |
+| RF02.2 | O card de Projetos FINEP deve exibir o valor total em milhões, não a contagem de registros. |
 | RF02.3 | O sistema deve exibir a data de última atualização dos dados no rodapé da página Home. |
 | RF02.4 | Cada card deve ser clicável e redirecionar para o módulo correspondente. |
 

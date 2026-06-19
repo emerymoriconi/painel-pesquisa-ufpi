@@ -5,8 +5,8 @@ def test_bolsistas_kpis_retorna_200(client):
 
 def test_bolsistas_kpis_campos(client):
     data = client.get("/bolsistas/kpis").json()
-    assert "cnpq" in data
-    assert "ufpi" in data
+    assert "total_cnpq" in data
+    assert "total_ufpi" in data
     assert "total" in data
 
 

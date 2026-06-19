@@ -12,8 +12,8 @@ def test_pdi_kpis_retorna_200(client):
 
 def test_pdi_kpis_campos(client):
     data = client.get("/projetos/pdi/kpis").json()
-    assert "concluidos" in data
-    assert "em_andamento" in data
+    assert "total_concluidos" in data
+    assert "total_em_andamento" in data
 
 
 def test_pdi_filtros_retorna_200(client):

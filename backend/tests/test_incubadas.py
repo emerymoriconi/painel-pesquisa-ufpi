@@ -6,7 +6,7 @@ def test_incubadas_kpis_retorna_200(client):
 def test_incubadas_kpis_campos(client):
     data = client.get("/incubadas/kpis").json()
     assert "total_incubadas" in data
-    assert "graduadas" in data
+    assert "total_graduadas" in data
     assert "total_incubadoras" in data
 
 

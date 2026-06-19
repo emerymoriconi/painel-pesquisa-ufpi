@@ -5,8 +5,8 @@ def test_pos_kpis_retorna_200(client):
 
 def test_pos_kpis_campo_total(client):
     data = client.get("/pos-graduacao/kpis").json()
-    assert "total" in data
-    assert isinstance(data["total"], int)
+    assert "total_pos_graduacao" in data
+    assert isinstance(data["total_pos_graduacao"], int)
 
 
 def test_pos_filtros_retorna_200(client):

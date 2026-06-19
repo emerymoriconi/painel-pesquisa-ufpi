@@ -5,9 +5,9 @@ def test_nucleos_kpis_retorna_200(client):
 
 def test_nucleos_kpis_campos(client):
     data = client.get("/nucleos/kpis").json()
-    assert "total" in data
-    assert "ativos" in data
-    assert "inativos" in data
+    assert "total_nucleos" in data
+    assert "total_ativos" in data
+    assert "total_inativos" in data
 
 
 def test_nucleos_filtros_retorna_200(client):
