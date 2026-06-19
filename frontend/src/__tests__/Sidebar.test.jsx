@@ -4,6 +4,12 @@ import Sidebar from '../components/Sidebar'
 
 const mockSair = vi.fn()
 
+vi.mock('react-router-dom', () => ({
+  MemoryRouter: ({ children }) => children,
+  NavLink: ({ to, children, onClick }) => <a href={to} onClick={onClick}>{children}</a>,
+  useNavigate: () => vi.fn(),
+}))
+
 vi.mock('../context/AuthContext', () => ({
   useAuth: () => ({ sair: mockSair, token: 'fake-token' }),
 }))

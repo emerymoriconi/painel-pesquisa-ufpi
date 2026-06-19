@@ -8,10 +8,11 @@ vi.mock('../context/AuthContext', () => ({
   useAuth: () => ({ entrar: mockEntrar }),
 }))
 
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom')
-  return { ...actual, useNavigate: () => mockNavigate }
-})
+vi.mock('react-router-dom', () => ({
+  MemoryRouter: ({ children }) => children,
+  Link: ({ to, children, className }) => <a href={to} className={className}>{children}</a>,
+  useNavigate: () => mockNavigate,
+}))
 
 import Login from '../pages/Login'
 
