@@ -92,7 +92,7 @@ export default function Laboratorios() {
     <div className="h-full flex flex-col gap-3">
 
       {/* ── Top: Card + Gráfico + Filtros ── */}
-      <div className="flex-shrink-0 flex gap-3 items-stretch" style={{ height: '230px' }}>
+      <div className="flex-shrink-0 flex gap-3 items-stretch" style={{ height: '280px' }}>
 
         {/* Card */}
         <div className="w-44 flex-shrink-0">
@@ -108,7 +108,7 @@ export default function Laboratorios() {
             {loadingGrafico ? (
               <div className="h-40 flex items-center justify-center text-gray-400 text-xs">Carregando…</div>
             ) : (
-              <ResponsiveContainer width="100%" height={168}>
+              <ResponsiveContainer width="100%" height={215}>
                 <PieChart>
                   <Pie
                     data={dadosPorCentro}
@@ -116,7 +116,7 @@ export default function Laboratorios() {
                     nameKey="centro"
                     cx="40%"
                     cy="50%"
-                    outerRadius={70}
+                    outerRadius={60}
                     label={({ value, percent }) =>
                       `${value} (${(percent * 100).toFixed(1).replace('.', ',')}%)`
                     }
@@ -128,7 +128,7 @@ export default function Laboratorios() {
                   </Pie>
                   <Tooltip content={<TooltipGrafico total={totalPie} />} />
                   <Legend layout="vertical" align="right" verticalAlign="middle" iconType="circle" iconSize={7}
-                    formatter={(value) => <span style={{ fontSize: 10 }}>{value}</span>}
+                    formatter={(value) => <span className="text-xs text-gray-700 dark:text-gray-300">{value}</span>}
                   />
                 </PieChart>
               </ResponsiveContainer>

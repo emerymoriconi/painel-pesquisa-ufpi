@@ -20,6 +20,7 @@ const COLUNAS = [
   { key: 'nome_lider',        label: 'NOME DO LÍDER' },
   { key: 'area_predominante', label: 'ÁREA PREDOMINANTE' },
   { key: 'ultimo_envio',      label: 'ÚLTIMO ENVIO' },
+  { key: 'status',            label: 'SITUAÇÃO' },
 ]
 
 function toOpts(arr = []) {
@@ -67,7 +68,7 @@ export default function GruposPesquisa() {
   useEffect(() => {
     setLoadingGrafico(true)
     getGruposPorArea(filtrosAtivos)
-      .then((data) => setDadosPorArea(Array.isArray(data) ? data.slice(0, 10) : []))
+      .then((data) => setDadosPorArea(Array.isArray(data) ? data : []))
       .catch(() => {})
       .finally(() => setLoadingGrafico(false))
   }, [filtroNome, filtroArea, filtroAno]) // eslint-disable-line
@@ -106,17 +107,21 @@ export default function GruposPesquisa() {
             {loadingGrafico ? (
               <div className="h-40 flex items-center justify-center text-gray-400 text-xs">Carregando…</div>
             ) : (
-              <ResponsiveContainer width="100%" height={168}>
-                <BarChart data={dadosPorArea} layout="vertical" margin={{ top: 2, right: 24, left: 0, bottom: 16 }}>
-                  <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                  <YAxis type="category" dataKey="area" width={110} tick={{ fontSize: 9 }} />
-                  <XAxis type="number" tick={{ fontSize: 10 }}
-                    label={{ value: 'N° DE GRUPOS', position: 'insideBottom', offset: -10, fontSize: 9, fill: '#6B7280' }}
-                  />
-                  <Tooltip content={<TooltipGrafico />} />
-                  <Bar dataKey="total" fill="#2E5F8A" radius={[0, 3, 3, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+              <div className="overflow-y-auto" style={{ maxHeight: 148 }}>
+                <div style={{ height: Math.max(148, dadosPorArea.length * 26), width: '100%' }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={dadosPorArea} layout="vertical" margin={{ top: 2, right: 24, left: 0, bottom: 16 }}>
+                      <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                      <YAxis type="category" dataKey="area" width={120} tick={{ fontSize: 9 }} />
+                      <XAxis type="number" tick={{ fontSize: 10 }}
+                        label={{ value: 'N° DE GRUPOS', position: 'insideBottom', offset: -10, fontSize: 9, fill: '#6B7280' }}
+                      />
+                      <Tooltip content={<TooltipGrafico />} />
+                      <Bar dataKey="total" fill="#2E5F8A" radius={[0, 3, 3, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
             )}
           </div>
           <div className="flex justify-end mt-1">

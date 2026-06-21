@@ -4,13 +4,14 @@ import { useTheme } from '../context/ThemeContext'
 import {
   iconProjetos, iconFomento, iconBolsistas, iconNucleos,
   iconGrupos, iconIncubadas, iconPosGraduacao, iconLaboratorios,
+  iconPatentes,
 } from '../assets/icons.js'
 
 const links = [
   { to: '/',                     label: 'Geral',                icone: null,               end: true },
   { to: '/projetos-pdi',         label: 'Projetos PD&I',        icone: iconProjetos },
   { to: '/projetos-finep',       label: 'Projetos FINEP',       icone: iconFomento },
-  { to: '/producao-intelectual', label: 'Produção Intelectual', icone: null },
+  { to: '/producao-intelectual', label: 'Produção Intelectual', icone: iconPatentes },
   { to: '/bolsistas',            label: 'Bolsistas',            icone: iconBolsistas },
   { to: '/nucleos',              label: 'Núcleos de Pesquisa',  icone: iconNucleos },
   { to: '/grupos',               label: 'Grupos de Pesquisa',   icone: iconGrupos },

@@ -149,7 +149,7 @@ export default function ProjetosFinep() {
                     ))}
                   </Pie>
                   <Tooltip content={<TooltipGrafico total={totalRelacao} />} />
-                  <Legend formatter={(value) => <span style={{ fontSize: 10 }}>{value}</span>} />
+                  <Legend formatter={(value) => <span className="text-xs text-gray-700 dark:text-gray-300">{value}</span>} />
                 </PieChart>
               </ResponsiveContainer>
             )}

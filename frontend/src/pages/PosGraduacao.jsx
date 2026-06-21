@@ -16,11 +16,14 @@ import BotaoExportarPNG from '../components/BotaoExportarPNG'
 import { iconPosGraduacao } from '../assets/icons.js'
 
 const COLUNAS = [
-  { key: 'programa', label: 'PROGRAMA' },
-  { key: 'fone',     label: 'FONE' },
-  { key: 'email',    label: 'EMAIL' },
-  { key: 'centro',   label: 'CENTRO' },
-  { key: 'nivel',    label: 'NÍVEL' },
+  { key: 'programa',       label: 'PROGRAMA' },
+  { key: 'fone',           label: 'FONE' },
+  { key: 'email',          label: 'EMAIL' },
+  { key: 'centro',         label: 'CENTRO' },
+  { key: 'nivel',          label: 'NÍVEL' },
+  { key: 'modalidade',     label: 'MODALIDADE' },
+  { key: 'tipo',           label: 'TIPO' },
+  { key: 'conceito_capes', label: 'CONCEITO CAPES' },
 ]
 
 function TickRotacionado({ x, y, payload }) {

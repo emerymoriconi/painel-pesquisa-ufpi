@@ -12,7 +12,7 @@ _G = models.GrupoPesquisa
 def _filtrar_grupos(q, nome_grupo=None, area_predominante=None, ultimo_envio=None):
     if nome_grupo:        q = q.filter(_G.nome_grupo.ilike(f"%{nome_grupo}%"))
     if area_predominante: q = q.filter(_G.area_predominante.ilike(f"%{area_predominante}%"))
-    if ultimo_envio:      q = q.filter(_G.ultimo_envio.ilike(f"%{ultimo_envio}%"))
+    if ultimo_envio:      q = q.filter(_G.ultimo_envio.ilike(f"%/{ultimo_envio}"))
     return q
 
 
@@ -39,10 +39,20 @@ def grupos_filtros(
             r[0] for r in db.query(col).filter(col != None).distinct().all()
         )
 
+    datas = [
+        r[0] for r in db.query(_G.ultimo_envio)
+        .filter(_G.ultimo_envio != None)
+        .distinct().all()
+    ]
+    anos_envio = sorted(
+        {v[-4:] for v in datas if v and len(v) >= 4 and v[-4:].isdigit()},
+        reverse=True,
+    )
+
     return {
         "nomes":      _unicos(_G.nome_grupo),
         "areas":      _unicos(_G.area_predominante),
-        "anos_envio": _unicos(_G.ultimo_envio),
+        "anos_envio": anos_envio,
     }
 
 
@@ -60,7 +70,6 @@ def grupos_por_area(
     rows = (
         q.group_by(_G.area_predominante)
         .order_by(func.count(_G.id).desc())
-        .limit(10)
         .all()
     )
     return [{"area": r.area_predominante, "total": r.total} for r in rows]

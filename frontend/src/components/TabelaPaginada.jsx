@@ -39,7 +39,7 @@ export default function TabelaPaginada({
                 <tr
                   key={i}
                   className={`${
-                    i % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50 dark:bg-gray-750'
+                    i % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50 dark:bg-gray-700'
                   } hover:bg-azul-claro dark:hover:bg-gray-700 transition-colors`}
                 >
                   {colunas.map((col) => (

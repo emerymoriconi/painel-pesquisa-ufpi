@@ -6,6 +6,7 @@ import iconNucleosAtivos  from '../../icons/Núcleos ativos.png'
 import iconNucleosInativos from '../../icons/Núcleos inativos.png'
 import iconGrupos         from '../../icons/Grupos de pesquisa.png'
 import iconIncubadas      from '../../icons/E. INCUBADAS.png'
+import iconInbate         from '../../icons/INBATE.png'
 import iconGraduadas      from '../../icons/Titulado.png'
 import iconPosGraduacao   from '../../icons/PÓS GRADUAÇÃO.png'
 import iconLaboratorios   from '../../icons/Laboratórios.png'
@@ -18,7 +19,7 @@ import iconEmAndamento    from '../../icons/Pesquisas em andamento.png'
 export {
   iconProjetos, iconFomento, iconBolsistas,
   iconNucleos, iconNucleosAtivos, iconNucleosInativos,
-  iconGrupos, iconIncubadas, iconGraduadas,
+  iconGrupos, iconIncubadas, iconGraduadas, iconInbate,
   iconPosGraduacao, iconLaboratorios,
   iconPatentes, iconSoftwares, iconMarcas,
   iconConcluidos, iconEmAndamento,

@@ -14,12 +14,14 @@ import TabelaPaginada from '../components/TabelaPaginada'
 import TooltipGrafico from '../components/TooltipGrafico'
 import BotaoExportarCSV from '../components/BotaoExportarCSV'
 import BotaoExportarPNG from '../components/BotaoExportarPNG'
-import { iconIncubadas, iconGraduadas } from '../assets/icons.js'
+import { iconIncubadas, iconGraduadas, iconInbate } from '../assets/icons.js'
 
 const COLUNAS = [
   { key: 'nome_projeto',   label: 'NOME DO PROJETO' },
   { key: 'objetivo',       label: 'OBJETIVO' },
   { key: 'equipe_projeto', label: 'EQUIPE DO PROJETO' },
+  { key: 'contato',        label: 'CONTATO' },
+  { key: 'incubadora',     label: 'INCUBADORA' },
 ]
 
 const CORES_DONUT = [
@@ -86,9 +88,9 @@ export default function EmpresasIncubadas() {
             <><SkeletonCard /><SkeletonCard /><SkeletonCard /></>
           ) : (
             <>
-              <CardMetrica titulo="Empresas Incubadas"  valor={kpis.total_incubadas}   icone={iconIncubadas} />
-              <CardMetrica titulo="Empresas Graduadas"  valor={kpis.total_graduadas}   icone={iconGraduadas} />
-              <CardMetrica titulo="Incubadoras"         valor={kpis.total_incubadoras} />
+              <CardMetrica titulo="Empresas Incubadas"  valor={kpis.total_incubadas}   icone={iconIncubadas} tamanhoValor="text-4xl" />
+              <CardMetrica titulo="Empresas Graduadas"  valor={kpis.total_graduadas}   icone={iconGraduadas} tamanhoValor="text-4xl" />
+              <CardMetrica titulo="Incubadoras"         valor={kpis.total_incubadoras} icone={iconInbate}    tamanhoValor="text-4xl" />
             </>
           )}
         </div>
@@ -143,7 +145,7 @@ export default function EmpresasIncubadas() {
                   </Pie>
                   <Tooltip content={<TooltipGrafico total={totalDonut} />} />
                   <Legend layout="vertical" align="right" verticalAlign="middle" iconType="circle" iconSize={7}
-                    formatter={(value) => <span style={{ fontSize: 10 }}>{value}</span>}
+                    formatter={(value) => <span className="text-xs text-gray-700 dark:text-gray-300">{value}</span>}
                   />
                 </PieChart>
               </ResponsiveContainer>

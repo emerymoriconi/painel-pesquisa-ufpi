@@ -18,12 +18,12 @@ import BotaoExportarPNG from '../components/BotaoExportarPNG'
 import { iconConcluidos, iconEmAndamento } from '../assets/icons.js'
 
 const COLUNAS = [
-  { key: 'area',        label: 'ÁREA DO CONHECIMENTO' },
+  { key: 'titulo',      label: 'PROJETOS' },
   { key: 'centro',      label: 'CENTRO' },
   { key: 'coordenador', label: 'COORDENADORES' },
   { key: 'natureza',    label: 'NATUREZA' },
-  { key: 'titulo',      label: 'PROJETOS' },
   { key: 'situacao',    label: 'SITUAÇÃO' },
+  { key: 'area',        label: 'ÁREA DO CONHECIMENTO' },
 ]
 
 function TickRotacionado({ x, y, payload }) {

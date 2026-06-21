@@ -25,6 +25,7 @@ const CORES = [
 
 const COLUNAS_VITRINE = [
   { key: 'pedido',     label: 'PEDIDO' },
+  { key: 'ano',        label: 'ANO' },
   { key: 'titulo',     label: 'TÍTULO' },
   { key: 'inventores', label: 'INVENTORES' },
   { key: 'descricao',  label: 'DESCRIÇÃO' },
@@ -129,7 +130,7 @@ export default function ProducaoIntelectual() {
                 <div className="h-36 flex items-center justify-center text-gray-400 text-xs">Carregando…</div>
               ) : (
                 <ResponsiveContainer width="100%" height={170}>
-                  <BarChart data={dadosPatentes} layout="vertical" margin={{ top: 0, right: 16, left: 0, bottom: 0 }}>
+                  <BarChart data={dadosPatentes.slice().reverse()} layout="vertical" margin={{ top: 0, right: 16, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis type="number" tick={{ fontSize: 10 }} />
                     <YAxis type="category" dataKey="ano" width={44} tick={{ fontSize: 10 }} />
@@ -152,15 +153,15 @@ export default function ProducaoIntelectual() {
               {loadingGraficos ? (
                 <div className="h-36 flex items-center justify-center text-gray-400 text-xs">Carregando…</div>
               ) : (
-                <ResponsiveContainer width="100%" height={170}>
+                <ResponsiveContainer width="100%" height={195}>
                   <PieChart>
-                    <Pie data={dadosSoftwares} dataKey="depositadas" nameKey="ano" cx="50%" cy="50%" outerRadius={64}>
+                    <Pie data={dadosSoftwares} dataKey="depositadas" nameKey="ano" cx="50%" cy="46%" outerRadius={58}>
                       {dadosSoftwares.map((_, i) => (
                         <Cell key={i} fill={CORES[i % CORES.length]} />
                       ))}
                     </Pie>
                     <Tooltip content={<TooltipGrafico total={totalSoftwares} />} />
-                    <Legend formatter={(value) => <span style={{ fontSize: 10 }}>{value}</span>} />
+                    <Legend formatter={(value) => <span className="text-xs text-gray-700 dark:text-gray-300">{value}</span>} />
                   </PieChart>
                 </ResponsiveContainer>
               )}

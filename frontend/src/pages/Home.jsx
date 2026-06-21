@@ -6,6 +6,7 @@ import SkeletonCard from '../components/SkeletonCard'
 import {
   iconProjetos, iconFomento, iconBolsistas, iconNucleos,
   iconGrupos, iconIncubadas, iconPosGraduacao, iconLaboratorios,
+  iconPatentes,
 } from '../assets/icons.js'
 
 export default function Home() {
@@ -23,7 +24,7 @@ export default function Home() {
   const cards = [
     { titulo: 'Projetos PD&I Cadastrados',    valor: kpis.total_projetos_pdi,        icone: iconProjetos,     onClick: () => navigate('/projetos-pdi') },
     { titulo: 'Projetos FINEP',               valor: kpis.total_projetos_finep != null ? `${kpis.total_projetos_finep} Mi` : undefined, icone: iconFomento, onClick: () => navigate('/projetos-finep') },
-    { titulo: 'Produção Intelectual',         valor: kpis.total_producao_intelectual, icone: null,             onClick: () => navigate('/producao-intelectual') },
+    { titulo: 'Produção Intelectual',         valor: kpis.total_producao_intelectual, icone: iconPatentes,     onClick: () => navigate('/producao-intelectual') },
     { titulo: 'Bolsistas de Produtividade',   valor: kpis.total_bolsistas,            icone: iconBolsistas,    onClick: () => navigate('/bolsistas') },
     { titulo: 'Núcleos de Pesquisa',          valor: kpis.total_nucleos,              icone: iconNucleos,      onClick: () => navigate('/nucleos') },
     { titulo: 'Grupos de Pesquisa (DGP/CNPq)', valor: kpis.total_grupos,             icone: iconGrupos,       onClick: () => navigate('/grupos') },
