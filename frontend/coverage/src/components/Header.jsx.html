@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for src/components/CardMetrica.jsx</title>
+    <title>Code coverage report for src/components/Header.jsx</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../../prettify.css" />
     <link rel="stylesheet" href="../../base.css" />
@@ -19,20 +19,20 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/components</a> CardMetrica.jsx</h1>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/components</a> Header.jsx</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>1/1</span>
+                <span class='fraction'>5/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">50% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>7/7</span>
+                <span class='fraction'>2/4</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>1/1</span>
+                <span class='fraction'>5/5</span>
             </div>
         
             
@@ -89,8 +89,50 @@
 <a name='L24'></a><a href='#L24'>24</a>
 <a name='L25'></a><a href='#L25'>25</a>
 <a name='L26'></a><a href='#L26'>26</a>
-<a name='L27'></a><a href='#L27'>27</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">180x</span>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -115,30 +157,54 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">export default function CardMetrica({ titulo, valor, subtitulo, onClick, icone, tamanhoValor = 'text-2xl' }) {
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { useLocation } from 'react-router-dom'
+import { useTheme } from '../context/ThemeContext'
+&nbsp;
+const titulos = {
+  '/':                     'Geral',
+  '/projetos-pdi':         'Projetos PD&amp;I',
+  '/projetos-finep':       'Projetos FINEP',
+  '/producao-intelectual': 'Produção Intelectual',
+  '/bolsistas':            'Bolsistas',
+  '/nucleos':              'Núcleos de Pesquisa',
+  '/grupos':               'Grupos de Pesquisa',
+  '/incubadas':            'Empresas Incubadas',
+  '/pos-graduacao':        'Pós-Graduação',
+  '/laboratorios':         'Laboratórios',
+}
+&nbsp;
+export default function Header({ onMenuClick }) {
+  const { pathname } = useLocation()
+  const { dark, toggleTheme } = useTheme()
+  const titulo = titulos[pathname] ?? <span class="branch-1 cbranch-no" title="branch not covered" >''</span>
+&nbsp;
   return (
-    &lt;div
-      onClick={onClick}
-      className={[
-        'bg-azul-escuro text-white p-3 rounded-xl',
-        onClick ? 'cursor-pointer hover:scale-105 transition-transform' : '',
-      ].join(' ')}
-    &gt;
-      &lt;p className="text-xs font-medium uppercase tracking-wide opacity-80 leading-tight"&gt;
+    &lt;header className="bg-white dark:bg-gray-800 shadow-sm px-4 py-3 flex items-center gap-4"&gt;
+      {/* Hamburguer — só mobile */}
+      &lt;button
+        onClick={onMenuClick}
+        className="md:hidden text-gray-600 dark:text-gray-300 text-xl leading-none"
+        aria-label="Abrir menu"
+      &gt;
+        ☰
+      &lt;/button&gt;
+&nbsp;
+      {/* Título da página */}
+      &lt;h1 className="flex-1 text-base font-semibold text-gray-800 dark:text-white"&gt;
         {titulo}
-      &lt;/p&gt;
-      &lt;p className={`${tamanhoValor} font-bold mt-1`}&gt;{valor}&lt;/p&gt;
-      {subtitulo &amp;&amp; (
-        &lt;p className="text-xs opacity-70 mt-0.5"&gt;{subtitulo}&lt;/p&gt;
-      )}
-      {icone &amp;&amp; (
-        &lt;img
-          src={icone}
-          alt=""
-          className="w-6 h-6 object-contain opacity-80 mt-2"
-        /&gt;
-      )}
-    &lt;/div&gt;
+      &lt;/h1&gt;
+&nbsp;
+      {/* Toggle dark mode — só desktop */}
+      &lt;button
+        onClick={toggleTheme}
+        className="hidden md:block text-gray-500 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white transition-colors text-xl"
+        aria-label="Alternar tema"
+      &gt;
+        {dark ? <span class="branch-0 cbranch-no" title="branch not covered" >'☀️' : '</span>🌙'}
+      &lt;/button&gt;
+    &lt;/header&gt;
   )
 }
 &nbsp;</pre></td></tr></table></pre>

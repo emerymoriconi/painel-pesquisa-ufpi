@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for src/components/CardMetrica.jsx</title>
+    <title>Code coverage report for src/components/Layout.jsx</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../../prettify.css" />
     <link rel="stylesheet" href="../../base.css" />
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/components</a> CardMetrica.jsx</h1>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/components</a> Layout.jsx</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>1/1</span>
+                <span class='fraction'>0/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>7/7</span>
+                <span class='fraction'>0/0</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>1/1</span>
+                <span class='fraction'>0/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>1/1</span>
+                <span class='fraction'>0/4</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -86,11 +86,22 @@
 <a name='L21'></a><a href='#L21'>21</a>
 <a name='L22'></a><a href='#L22'>22</a>
 <a name='L23'></a><a href='#L23'>23</a>
-<a name='L24'></a><a href='#L24'>24</a>
-<a name='L25'></a><a href='#L25'>25</a>
-<a name='L26'></a><a href='#L26'>26</a>
-<a name='L27'></a><a href='#L27'>27</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">180x</span>
+<a name='L24'></a><a href='#L24'>24</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -98,46 +109,26 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">export default function CardMetrica({ titulo, valor, subtitulo, onClick, icone, tamanhoValor = 'text-2xl' }) {
-  return (
-    &lt;div
-      onClick={onClick}
-      className={[
-        'bg-azul-escuro text-white p-3 rounded-xl',
-        onClick ? 'cursor-pointer hover:scale-105 transition-transform' : '',
-      ].join(' ')}
-    &gt;
-      &lt;p className="text-xs font-medium uppercase tracking-wide opacity-80 leading-tight"&gt;
-        {titulo}
-      &lt;/p&gt;
-      &lt;p className={`${tamanhoValor} font-bold mt-1`}&gt;{valor}&lt;/p&gt;
-      {subtitulo &amp;&amp; (
-        &lt;p className="text-xs opacity-70 mt-0.5"&gt;{subtitulo}&lt;/p&gt;
-      )}
-      {icone &amp;&amp; (
-        &lt;img
-          src={icone}
-          alt=""
-          className="w-6 h-6 object-contain opacity-80 mt-2"
-        /&gt;
-      )}
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { useState } from 'react'
+import { Outlet } from 'react-router-dom'
+import Sidebar from './Sidebar'
+import Header from './Header'
+&nbsp;
+export default function <span class="fstat-no" title="function not covered" >Layout() {</span>
+  const [sidebarAberta, <span class="cstat-no" title="statement not covered" >setSidebarAberta] = useState(false)</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  return (</span>
+    &lt;div className="flex h-screen bg-gray-50 dark:bg-gray-900"&gt;
+      &lt;Sidebar
+        isOpen={sidebarAberta}
+<span class="fstat-no" title="function not covered" >        onClose={() =&gt; <span class="cstat-no" title="statement not covered" >s</span>etSidebarAberta(false)}</span>
+      /&gt;
+      &lt;div className="flex-1 flex flex-col overflow-hidden"&gt;
+        &lt;Header <span class="fstat-no" title="function not covered" >onMenuClick={() =&gt; <span class="cstat-no" title="statement not covered" >s</span>etSidebarAberta(true)} /&gt;</span>
+        &lt;main className="flex-1 overflow-hidden p-4"&gt;
+          &lt;Outlet /&gt;
+        &lt;/main&gt;
+      &lt;/div&gt;
     &lt;/div&gt;
   )
 }

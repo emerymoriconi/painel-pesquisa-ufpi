@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for src/components/CardMetrica.jsx</title>
+    <title>Code coverage report for src/components/FiltroTexto.jsx</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../../prettify.css" />
     <link rel="stylesheet" href="../../base.css" />
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/components</a> CardMetrica.jsx</h1>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/components</a> FiltroTexto.jsx</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>1/1</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>7/7</span>
+                <span class='fraction'>3/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>1/1</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>1/1</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
@@ -87,10 +87,14 @@
 <a name='L22'></a><a href='#L22'>22</a>
 <a name='L23'></a><a href='#L23'>23</a>
 <a name='L24'></a><a href='#L24'>24</a>
-<a name='L25'></a><a href='#L25'>25</a>
-<a name='L26'></a><a href='#L26'>26</a>
-<a name='L27'></a><a href='#L27'>27</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">180x</span>
+<a name='L25'></a><a href='#L25'>25</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">28x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -100,44 +104,34 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">export default function CardMetrica({ titulo, valor, subtitulo, onClick, icone, tamanhoValor = 'text-2xl' }) {
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">export default function FiltroTexto({
+  label,
+  value,
+  onChange,
+  placeholder,
+  className = '',
+}) {
   return (
-    &lt;div
-      onClick={onClick}
-      className={[
-        'bg-azul-escuro text-white p-3 rounded-xl',
-        onClick ? 'cursor-pointer hover:scale-105 transition-transform' : '',
-      ].join(' ')}
-    &gt;
-      &lt;p className="text-xs font-medium uppercase tracking-wide opacity-80 leading-tight"&gt;
-        {titulo}
-      &lt;/p&gt;
-      &lt;p className={`${tamanhoValor} font-bold mt-1`}&gt;{valor}&lt;/p&gt;
-      {subtitulo &amp;&amp; (
-        &lt;p className="text-xs opacity-70 mt-0.5"&gt;{subtitulo}&lt;/p&gt;
+    &lt;div className={`flex flex-col gap-0.5 ${className}`}&gt;
+      {label &amp;&amp; (
+        &lt;label className="text-xs font-medium text-gray-700 dark:text-gray-300"&gt;
+          {label}
+        &lt;/label&gt;
       )}
-      {icone &amp;&amp; (
-        &lt;img
-          src={icone}
-          alt=""
-          className="w-6 h-6 object-contain opacity-80 mt-2"
-        /&gt;
-      )}
+      &lt;input
+        type="text"
+        value={value}
+        onChange={(e) =&gt; onChange(e.target.value)}
+        placeholder={placeholder}
+        className="border border-gray-300 rounded px-2 py-1 bg-white text-xs focus:outline-none focus:ring-1 focus:ring-azul-medio dark:bg-gray-800 dark:text-white dark:border-gray-600"
+      /&gt;
     &lt;/div&gt;
   )
 }

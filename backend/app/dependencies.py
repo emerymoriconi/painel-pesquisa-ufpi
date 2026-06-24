@@ -1,6 +1,5 @@
 from app.database import SessionLocal
-from app.auth import verificar_autenticacao  # noqa: F401 — re-exportado para os routers
-
+from app.auth import verificar_autenticacao  # noqa: F401
 
 def get_db():
     db = SessionLocal()

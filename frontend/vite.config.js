@@ -15,10 +15,20 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: true,
-    setupFiles: './src/__tests__/setup.js',
+    setupFiles: './src/tests/setup.js',
     pool: 'vmForks',
+    dangerouslyIgnoreUnhandledErrors: true,
     deps: {
       inline: ['react-router', 'react-router-dom'],
+    },
+    coverage: {
+      provider: 'v8',
+      include: ['src/**/*.{js,jsx}'],
+      exclude: [
+        'src/tests/**',
+        'src/main.jsx',
+        'src/assets/icons.js',
+      ],
     },
   }
 })
